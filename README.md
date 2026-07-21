@@ -8,6 +8,7 @@ Pesquisa exploratória e definições iniciais.
 Mortes violentas de crianças e adolescentes no Distrito Federal.
 
 ## Estrutura do repositório (rascunho)
+```text
 │
 ├── README.md
 ├── LICENSE
@@ -44,3 +45,4 @@ Mortes violentas de crianças e adolescentes no Distrito Federal.
 │   
 ├── 09_referencias/
 
+``
