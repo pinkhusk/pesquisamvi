@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chico - Pesquisa - Repositório de Pesquisa Jurídica</title>
+  <style>
+    :root {
+      --bg: #FFF; --fg: #000; --user-bg: #f4f4f4;
+      --code-bg: #ececec; --table-bdr: rgba(0,0,0,0.15);
+      --bq-bdr: rgba(0,0,0,0.2); --cb-bg: #2a2a2a; --cb-bdr: #000;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif;
+      font-size: 16px; background: var(--bg); color: var(--fg);
+      padding: 20px; margin: 0 auto; line-height: 1.6;
+    }
+    .header {
+      text-align: center; margin: 0 auto 30px;
+      border-bottom: 2px dashed var(--fg); padding-bottom: 15px; max-width: 1200px;
+    }
+    .title { font-size: 24px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+    .timestamp { font-size: 14px; margin-top: 10px; opacity: 0.7; }
+    .conversation { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .message { margin-bottom: 20px; padding: 10px 20px; border-radius: 18px; width: fit-content; clear: both; overflow: hidden; }
+    .user-message { float: right; max-width: 80%; background: var(--user-bg); }
+    .assistant-message { float: left; max-width: 95%; }
+    .content { user-select: text; overflow-wrap: break-word; }
+    .content img { max-height: 220px; width: auto; border-radius: 8px; margin: 8px 0; display: block; cursor: zoom-in; transition: opacity 0.15s; }
+    .content img:hover { opacity: 0.85; }
+    #lb { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; }
+    #lb.open { display: flex; }
+    #lb img { max-width: 90vw; max-height: 90vh; border-radius: 10px; object-fit: contain; cursor: default; box-shadow: 0 8px 40px rgba(0,0,0,0.6); }
+    .content h1 { font-size: 24px; margin: .67em 0; }
+    .content h2 { font-size: 20px; margin: .75em 0; }
+    .content h3 { font-size: 18px; margin: .83em 0; }
+    .content h4 { font-size: 16px; margin: 1.12em 0; }
+    .content h5 { font-size: 14px; margin: 1.5em 0; }
+    .content h6 { font-size: 12px; margin: 1.67em 0; }
+    table { border-collapse: collapse; font-size: 14px; width: 100%; margin: 16px 0; }
+    th, td { padding: 8px 16px; text-align: left; vertical-align: top; font-size: 14px; }
+    th { font-weight: 600; border-bottom: 2px solid var(--table-bdr); }
+    td { border-bottom: 1px solid var(--table-bdr); }
+    tr:last-child td { border-bottom: none; }
+    hr { border: none; border-top: 1px solid var(--table-bdr); margin: 28px 0; clear: both; }
+    blockquote { border-left: 4px solid var(--bq-bdr); margin: 8px 0; padding: 8px 0 8px 24px; font-weight: 500; }
+    li { margin: 10px 0; }
+    code { background: var(--code-bg); color: var(--fg); padding: 2px 5px; border-radius: 4px; font-size: .9em; }
+    .code-wrapper { border-radius: 8px; overflow: hidden; margin: 12px 0; }
+    .code-header {
+      background: #1a1a1a; padding: 8px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .code-header::before {
+      content: "</>"; font-size: 11px; color: #10a37f; font-weight: 700;
+    }
+    .code-lang { font-size: 13px; font-weight: 500; color: #ccc; font-family: inherit; }
+    .code-block {
+      background: var(--cb-bg) !important; color: #fff !important;
+      padding: 16px !important; margin: 0 !important; border-radius: 0 !important;
+      border: none !important;
+      font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace !important;
+      font-size: 14px !important; line-height: 1.5 !important;
+      overflow-x: auto !important; white-space: pre !important;
+    }
+    .code-block code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: inherit; }
+    .hljs { background: transparent; color: #f8f8f2; }
+    .hljs-keyword,.hljs-selector-tag { color: #ff79c6; }
+    .hljs-string,.hljs-attr { color: #f1fa8c; }
+    .hljs-number,.hljs-literal { color: #bd93f9; }
+    .hljs-title,.hljs-function,.hljs-section { color: #50fa7b; }
+    .hljs-comment,.hljs-quote { color: #6272a4; font-style: italic; }
+    .hljs-params { color: #f8f8f2; }
+    .hljs-built_in,.hljs-type { color: #8be9fd; }
+    .hljs-variable,.hljs-template-variable { color: #ffb86c; }
+    .hljs-attribute,.hljs-tag { color: #ff79c6; }
+    .hljs-name { color: #50fa7b; }
+    .hljs-regexp,.hljs-link { color: #f1fa8c; }
+    .hljs-symbol,.hljs-bullet { color: #bd93f9; }
+    .hljs-meta { color: #6272a4; }
+    .hljs-deletion { color: #ff5555; }
+    .hljs-addition { color: #50fa7b; }
+    .hljs-emphasis { font-style: italic; }
+    .hljs-strong { font-weight: bold; }
+    .entity { text-decoration: underline; text-underline-offset: 3px; }
+    sup.cite { font-size: 10px; line-height: 1; }
+    a.cite-num { text-decoration: none; color: #10a37f; font-weight: 600; margin: 0 1px; }
+
+    del { text-decoration: line-through; opacity: 0.7; }
+    .math-block { margin: 16px 0; text-align: center; overflow-x: auto; }
+    .footnotes { font-size: 13px; padding-left: 20px; margin-top: 4px; }
+    .footnotes li { margin: 4px 0; opacity: 0.75; }
+    .fn-back { text-decoration: none; margin-left: 4px; }
+    sup a { text-decoration: none; color: #10a37f; }
+    li input[type="checkbox"] { margin-right: 5px; pointer-events: none; vertical-align: middle; }
+        @media print {
+      .message { float: none !important; max-width: 100% !important; }
+      .code-block { white-space: pre-wrap !important; }
+    }
+  </style>
+  
+</head>
+<body>
+  <div class="header">
+    <h1 class="title">Chico - Pesquisa - Repositório de Pesquisa Jurídica</h1>
+    <div class="timestamp">22/07/2026, 17:53:56</div>
+  </div>
+  <div class="conversation">
+    <div class="message user-message"><div class="content"><p>quero fazer um repositório no github para publicizar o processo da pesquisa</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Vou estruturar isso como um repositório de pesquisa aberta: arquitetura de pastas, documentação, critérios de publicização e um modelo inicial de README adequado à pesquisa jurídica empírica.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>É uma estratégia muito adequada, sobretudo para uma <strong>pesquisa jurídica empírica e comparada</strong>. O repositório não deve funcionar apenas como depósito de arquivos, mas como um <strong>caderno público de pesquisa</strong>, registrando metodologia, decisões, fontes, bases de dados, versões e resultados.</p>
+
+<h2>1. Modelo recomendado</h2>
+
+<p>Sugiro trabalhar com duas camadas:</p>
+
+<p><strong>Repositório GitHub:</strong> documentação técnica, bases, scripts, protocolos metodológicos e histórico de versões.</p>
+
+<p><strong>Site GitHub Pages:</strong> apresentação pública e acessível da pesquisa, com linguagem menos técnica, objetivos, andamento, produtos e principais achados. O GitHub Pages publica um site estático diretamente a partir de um repositório. <sup class="cite">[<a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages?ref=insys&utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="What is GitHub Pages? - GitHub Docs">GitHub Docs</a>]</sup></p>
+
+<p>Um nome possível, considerando o levantamento recente, seria:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">levantamento-processos-estruturais-america-latina</pre></div>
+
+
+<p>Ou, de forma mais abrangente:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">pesquisa-processual-comparada-america-latina</pre></div>
+
+
+<h2>2. Estrutura do repositório</h2>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">levantamento-processos-estruturais-america-latina/
+│
+├── README.md
+├── CITATION.cff
+├── LICENSE
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── .gitignore
+│
+├── 01_projeto/
+│   ├── problema_de_pesquisa.md
+│   ├── objetivos.md
+│   ├── delimitacao_conceitual.md
+│   ├── escopo_geografico.md
+│   └── cronograma.md
+│
+├── 02_metodologia/
+│   ├── protocolo_de_pesquisa.md
+│   ├── estrategia_de_busca.md
+│   ├── criterios_de_inclusao_exclusao.md
+│   ├── categorias_analiticas.md
+│   ├── controle_de_qualidade.md
+│   └── limitacoes.md
+│
+├── 03_fontes/
+│   ├── fontes_normativas.csv
+│   ├── fontes_jurisprudenciais.csv
+│   ├── fontes_bibliograficas.csv
+│   └── portais_consultados.md
+│
+├── 04_dados/
+│   ├── README.md
+│   ├── brutos/
+│   ├── tratados/
+│   ├── dicionarios/
+│   │   └── dicionario_de_variaveis.csv
+│   └── amostras_publicas/
+│
+├── 05_scripts/
+│   ├── coleta/
+│   ├── tratamento/
+│   ├── analise/
+│   └── README.md
+│
+├── 06_cadernos_de_pesquisa/
+│   ├── diario_de_pesquisa.md
+│   ├── decisoes_metodologicas.md
+│   └── registro_de_alteracoes.md
+│
+├── 07_paises/
+│   ├── brasil/
+│   ├── colombia/
+│   ├── peru/
+│   ├── mexico/
+│   └── argentina/
+│
+├── 08_resultados/
+│   ├── tabelas/
+│   ├── graficos/
+│   ├── quadros_comparativos/
+│   └── resultados_preliminares.md
+│
+├── 09_relatorios/
+│   ├── relatorios_parciais/
+│   ├── sumarios_executivos/
+│   └── relatorio_final/
+│
+├── 10_referencias/
+│   ├── referencias.bib
+│   └── bibliografia_essencial.md
+│
+└── docs/
+    ├── index.md
+    ├── metodologia.md
+    ├── andamento.md
+    ├── resultados.md
+    └── sobre.md</pre></div>
+
+
+<h2>3. O núcleo público da pesquisa</h2>
+
+<p>O <code>README.md</code> será a página inicial do projeto. O próprio GitHub recomenda que cada repositório tenha um README, acompanhado, conforme o caso, de licença, arquivo de citação, orientações de contribuição e código de conduta. <sup class="cite">[<a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/best-practices-for-repositories?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Best practices for repositories - GitHub Docs">GitHub Docs</a>]</sup></p>
+
+<p>Ele deve conter:</p>
+
+<ol><li>título completo da pesquisa;</li><li>apresentação institucional;</li><li>problema de pesquisa;</li><li>objetivos;</li><li>recorte territorial e temporal;</li><li>metodologia;</li><li>países e sistemas jurídicos examinados;</li><li>estágio atual da investigação;</li><li>estrutura do repositório;</li><li>produtos já concluídos;</li><li>política de atualização;</li><li>forma de citação;</li><li>autoria e vínculos institucionais;</li><li>licenças e restrições de uso;</li><li>contato acadêmico.</li></ol>
+
+<h2>4. Registro do processo, e não apenas dos resultados</h2>
+
+<p>A parte mais importante para publicizar o <strong>processo</strong> será o diretório <code>06_cadernos_de_pesquisa</code>.</p>
+
+<h3><code>diario_de_pesquisa.md</code></h3>
+
+<p>Registra cronologicamente:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section">## 21 de julho de 2026</span>
+
+<span class="hljs-section">### Atividades realizadas</span>
+<span class="hljs-bullet">-</span> Revisão do levantamento sobre o Peru.
+<span class="hljs-bullet">-</span> Consolidação das categorias relativas às ações coletivas.
+<span class="hljs-bullet">-</span> Verificação de jurisprudência paradigmática.
+
+<span class="hljs-section">### Decisões metodológicas</span>
+<span class="hljs-bullet">-</span> Separação entre técnicas estruturais e procedimentos formalmente especiais.
+<span class="hljs-bullet">-</span> Inclusão de categoria específica para mecanismos de monitoramento judicial.
+
+<span class="hljs-section">### Pendências</span>
+<span class="hljs-bullet">-</span> Verificar legislação mexicana.
+<span class="hljs-bullet">-</span> Revisar fontes primárias argentinas.
+
+<span class="hljs-section">### Produtos atualizados</span>
+<span class="hljs-bullet">-</span> Quadro comparativo.
+<span class="hljs-bullet">-</span> Relatório nacional do Peru.</pre></div>
+
+
+<h3><code>decisoes_metodologicas.md</code></h3>
+
+<p>Deve explicar alterações relevantes, por exemplo:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section">## DM-004 — Separação entre celeridade e estruturalidade</span>
+
+<span class="hljs-strong">**Data:**</span> 21 de julho de 2026.
+
+<span class="hljs-strong">**Decisão:**</span> A pesquisa passou a distinguir mecanismos processuais
+destinados à tramitação célere de técnicas voltadas à reorganização
+estrutural de instituições e políticas públicas.
+
+<span class="hljs-strong">**Justificativa:**</span> A análise inicial demonstrou que nem todo procedimento
+célere possui natureza estrutural e que processos estruturais podem exigir
+tramitação prolongada, monitoramento e implementação progressiva.
+
+<span class="hljs-strong">**Impacto:**</span> Revisão das categorias do banco comparativo.</pre></div>
+
+
+<p>Esse registro aumenta a transparência e permite demonstrar como as conclusões foram construídas.</p>
+
+<h2>5. Organização por país</h2>
+
+<p>Cada diretório nacional pode seguir o mesmo padrão:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">07_paises/peru/
+├── README.md
+├── sistema_processual.md
+├── processos_estruturais.md
+├── acoes_coletivas.md
+├── demandas_contra_reguladores.md
+├── jurisprudencia.md
+├── fontes.csv
+├── quadro_sintetico.csv
+└── relatorio.md</pre></div>
+
+
+<p>A padronização permitirá comparar Brasil, Colômbia, Peru, México e Argentina sem misturar informações provenientes de sistemas jurídicos distintos.</p>
+
+<h2>6. Bases de dados</h2>
+
+<p>Para cada base publicada, inclua obrigatoriamente:</p>
+
+<ul><li>nome e finalidade;</li><li>unidade de análise;</li><li>período de cobertura;</li><li>fonte de cada registro;</li><li>critérios de inclusão e exclusão;</li><li>significado das variáveis;</li><li>data da última atualização;</li><li>limitações;</li><li>licença ou condições de utilização.</li></ul>
+
+<p>Exemplo de <code>dicionario_de_variaveis.csv</code>:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">variavel,descricao,tipo,valores_permitidos,fonte,observacoes
+pais,País do sistema jurídico,texto,Brasil|Colômbia|Peru|México|Argentina,Pesquisa,Obrigatório
+mecanismo,Instrumento processual identificado,texto,Livre,Norma ou decisão,Obrigatório
+natureza_estrutural,Indica presença de elementos estruturais,categórica,Sim|Não|Parcial,Análise do pesquisador,Requer justificativa
+celeridade,Existência de mecanismo de aceleração,categórica,Sim|Não|Indeterminado,Norma ou jurisprudência,Não confundir com estruturalidade
+monitoramento,Existência de acompanhamento da execução,categórica,Sim|Não|Parcial,Decisão judicial,—</pre></div>
+
+
+<h2>7. Documentos que não devem ser publicados diretamente</h2>
+
+<p>Antes de tornar o repositório público, retire ou substitua:</p>
+
+<ul><li>documentos institucionais de circulação restrita;</li><li>informações pessoais ou dados sensíveis;</li><li>credenciais, senhas, tokens e chaves de acesso;</li><li>bancos integrais cuja redistribuição não esteja autorizada;</li><li>PDFs de livros e artigos protegidos;</li><li>pareceres, relatórios ou manuscritos de terceiros ainda não publicados;</li><li>anotações que identifiquem pessoas envolvidas em casos concretos;</li><li>arquivos internos do STF ou de outras instituições sem autorização de divulgação.</li></ul>
+
+<p>Para bibliografia protegida, publique apenas a <strong>referência bibliográfica, o endereço oficial e suas notas autorais</strong>, não o arquivo integral.</p>
+
+<p>Uma boa estratégia é manter:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">dados-restritos/</pre></div>
+
+
+<p>fora do repositório e inserir essa pasta no <code>.gitignore</code>.</p>
+
+<h2>8. Controle de versões</h2>
+
+<p>Utilize versões vinculadas às etapas da pesquisa:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">v0.1.0 — Estrutura inicial e protocolo metodológico
+v0.2.0 — Levantamentos de Colômbia e Peru
+v0.3.0 — Inclusão de México e Argentina
+v0.4.0 — Banco comparativo consolidado
+v1.0.0 — Relatório final e base validada</pre></div>
+
+
+<p>O arquivo <code>CHANGELOG.md</code> deve registrar o que foi acrescentado, corrigido ou excluído em cada versão.</p>
+
+<h2>9. Citação acadêmica e DOI</h2>
+
+<p>O arquivo <code>CITATION.cff</code> permite informar autoria, título, versão, data, identificadores e forma preferencial de citação. Quando reconhecido, o GitHub apresenta ao visitante a opção de citar o repositório; para bases de dados, o arquivo pode indicar o tipo <code>dataset</code>. <sup class="cite">[<a href="https://docs.github.com/en/enterprise-cloud%40latest/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="About CITATION files - GitHub Enterprise Cloud Docs">GitHub Docs</a>]</sup></p>
+
+<p>Posteriormente, uma versão estável pode ser integrada ao Zenodo. A plataforma permite arquivar uma <em>release</em> do GitHub e atribuir DOI ao registro publicado, tornando aquela versão permanentemente identificável e citável. <sup class="cite">[<a href="https://help.zenodo.org/docs/github/enable-repository/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Enable a repository | Zenodo">Zenodo</a>]</sup></p>
+
+<h2>10. Estratégia de publicação</h2>
+
+<p>Recomendo este fluxo:</p>
+
+<p><strong>Fase 1 — preparação privada:</strong> montar pastas, revisar arquivos e retirar conteúdo restrito.</p>
+
+<p><strong>Fase 2 — abertura pública:</strong> publicar README, projeto, protocolo metodológico, fontes e diário de pesquisa.</p>
+
+<p><strong>Fase 3 — atualizações periódicas:</strong> lançar versões ao final de cada levantamento nacional.</p>
+
+<p><strong>Fase 4 — consolidação:</strong> publicar banco tratado, quadro comparativo e relatório final.</p>
+
+<p><strong>Fase 5 — preservação:</strong> gerar uma <em>release</em> estável, vincular ao Zenodo e registrar o DOI.</p>
+
+<h2>11. Configuração inicial no GitHub</h2>
+
+<p>Na criação do repositório, selecione:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Repository name:
+levantamento-processos-estruturais-america-latina
+
+Description:
+Pesquisa jurídica empírica e comparada sobre processos estruturais,
+ações coletivas e demandas contra autoridades reguladoras na América Latina.
+
+Visibility:
+Private inicialmente; Public após a revisão dos materiais.
+
+Initialize:
+Add a README file
+
+.gitignore:
+Python, caso existam scripts de coleta ou análise
+
+License:
+Definir após separar código, textos, dados e materiais de terceiros.</pre></div>
+
+
+<p>O GitHub permite criar o repositório pela interface, escolher a visibilidade e inicializá-lo com README, <code>.gitignore</code> e licença. <sup class="cite">[<a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Creating a new repository - GitHub Docs">GitHub Docs</a>]</sup></p>
+
+<p>A estrutura mais consistente para seu caso é, portanto, um <strong>repositório público de pesquisa aberta, acompanhado de diário metodológico, bases documentadas, organização por país, controle de versões e página institucional de divulgação</strong>. O próximo passo é criar o pacote inicial do repositório, com as pastas e os arquivos <code>README.md</code>, <code>CITATION.cff</code>, <code>CHANGELOG.md</code>, <code>.gitignore</code> e os modelos metodológicos já preenchidos.</p></div></div>
+    <div class="message user-message"><div class="content"><p>O "Projeto.pdf" é a terceira versão</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Perfeito. Vou registrar <strong><code>Projeto.pdf</code> como a terceira versão — V3 — e como a versão de referência atual</strong>. Ela já incorpora a rede de proteção do Distrito Federal, o princípio da prioridade absoluta, a análise de decisões do STF, STJ e TJDFT e o estudo de caso. fileciteturn0file0</p>
+
+<p>Para o repositório, sugiro renomeá-la como:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">projeto_pesquisa_v03.pdf</pre></div>
+
+
+<p>O arquivo <code>Projeto 2.pdf</code> apresenta uma formulação anterior, ainda concentrada nos fatores associados às mortes violentas, na produção jurídica baseada em evidências e na justiça restaurativa. fileciteturn0file2</p>
+
+<p>Já o conteúdo extraído de <code>Projeto-1.pdf</code> aparece idêntico ao de <code>Projeto.pdf</code>. fileciteturn0file1 Assim, por enquanto, vou tratá-lo como possível cópia da V3, e não como uma versão autônoma.</p>
+
+<p>No GitHub, a organização pode ficar assim:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/
+├── versoes/
+│   ├── projeto_pesquisa_v01.pdf
+│   ├── projeto_pesquisa_v02.pdf
+│   └── projeto_pesquisa_v03.pdf
+├── projeto_atual.pdf
+└── historico_de_versoes.md</pre></div>
+
+
+<p>O arquivo <code>historico_de_versoes.md</code> explicará objetivamente o que mudou entre cada formulação.</p></div></div>
+    <div class="message user-message"><div class="content"><p>refaça a estrutura do repositório</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>A estrutura deve refletir a <strong>evolução do projeto</strong>, os diferentes eixos metodológicos e a necessidade de separar dados públicos de materiais sensíveis. A terceira versão amplia a investigação para a rede de proteção do Distrito Federal, o princípio da prioridade absoluta, a jurisprudência do STF, STJ e TJDFT e o estudo de caso. fileciteturn0file0</p>
+
+<h2>Nome sugerido</h2>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">mortes-violentas-infancia-df</pre></div>
+
+
+<p>Descrição do repositório:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Repositório público da pesquisa sobre mortes violentas de crianças e
+adolescentes, redes de proteção e prioridade absoluta no Distrito Federal.</pre></div>
+
+
+<h2>Estrutura revisada</h2>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">mortes-violentas-infancia-df/
+│
+├── README.md
+├── LICENSE
+├── CITATION.cff
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── .gitignore
+│
+├── 01_projeto/
+│   ├── README.md
+│   ├── projeto_atual.md
+│   ├── historico_de_versoes.md
+│   │
+│   ├── versoes/
+│   │   ├── v01/
+│   │   │   ├── projeto_v01.pdf
+│   │   │   └── nota_da_versao.md
+│   │   │
+│   │   ├── v02/
+│   │   │   ├── projeto_v02.pdf
+│   │   │   └── nota_da_versao.md
+│   │   │
+│   │   └── v03/
+│   │       ├── projeto_v03.pdf
+│   │       ├── projeto_v03.md
+│   │       └── nota_da_versao.md
+│   │
+│   └── arquivos_originais/
+│       ├── Projeto.pdf
+│       ├── Projeto-1.pdf
+│       └── Projeto 2.pdf
+│
+├── 02_problema_e_objetivos/
+│   ├── problema_de_pesquisa.md
+│   ├── pergunta_central.md
+│   ├── perguntas_secundarias.md
+│   ├── objetivo_geral.md
+│   ├── objetivos_especificos.md
+│   ├── hipotese.md
+│   ├── justificativa.md
+│   └── delimitacoes.md
+│
+├── 03_marco_teorico/
+│   ├── README.md
+│   ├── necropolitica.md
+│   ├── territorio.md
+│   ├── estado_e_periferia.md
+│   ├── prioridade_absoluta.md
+│   ├── redes_de_protecao.md
+│   ├── direito_e_producao_da_morte.md
+│   └── mapa_conceitual.md
+│
+├── 04_revisao_de_literatura/
+│   ├── README.md
+│   ├── protocolo_de_revisao.md
+│   ├── estrategias_de_busca.md
+│   ├── criterios_de_inclusao.md
+│   ├── criterios_de_exclusao.md
+│   ├── bases_consultadas.md
+│   ├── literatura_juridica.md
+│   ├── literatura_interdisciplinar.md
+│   ├── fichamentos/
+│   └── banco_bibliografico.csv
+│
+├── 05_metodologia/
+│   ├── README.md
+│   ├── desenho_da_pesquisa.md
+│   ├── protocolo_geral.md
+│   ├── conceitos_operacionais.md
+│   ├── unidades_de_analise.md
+│   ├── fontes_de_dados.md
+│   ├── procedimentos_de_coleta.md
+│   ├── procedimentos_de_analise.md
+│   ├── criterios_de_validacao.md
+│   ├── limitacoes.md
+│   └── etica_e_protecao_de_dados.md
+│
+├── 06_eixos_de_investigacao/
+│   ├── 01_mortes_violentas/
+│   │   ├── README.md
+│   │   ├── definicao_conceitual.md
+│   │   ├── classificacao_das_mortes.md
+│   │   ├── fatores_de_risco.md
+│   │   └── indicadores.md
+│   │
+│   ├── 02_territorios_e_grupos/
+│   │   ├── README.md
+│   │   ├── recorte_territorial.md
+│   │   ├── grupos_vitimizados.md
+│   │   ├── desigualdades.md
+│   │   └── territorializacao_dos_dados.md
+│   │
+│   ├── 03_rede_de_protecao/
+│   │   ├── README.md
+│   │   ├── mapa_da_rede.md
+│   │   ├── politicas_publicas.md
+│   │   ├── prioridades_institucionais.md
+│   │   ├── fluxos_de_atendimento.md
+│   │   └── lacunas_de_protecao.md
+│   │
+│   ├── 04_prioridade_absoluta/
+│   │   ├── README.md
+│   │   ├── base_normativa.md
+│   │   ├── categorias_juridicas.md
+│   │   ├── usos_do_principio.md
+│   │   └── limites_interpretativos.md
+│   │
+│   └── 05_estudo_de_caso/
+│       ├── README.md
+│       ├── protocolo_do_estudo.md
+│       ├── criterios_de_selecao.md
+│       ├── cronologia_anonimizada.md
+│       ├── resposta_institucional.md
+│       └── analise_do_caso.md
+│
+├── 07_jurisprudencia/
+│   ├── README.md
+│   ├── protocolo_de_busca.md
+│   ├── criterios_de_selecao.md
+│   ├── livro_de_codigos.md
+│   ├── dicionario_de_variaveis.csv
+│   │
+│   ├── stf/
+│   │   ├── README.md
+│   │   ├── base_publica.csv
+│   │   └── resultados.md
+│   │
+│   ├── stj/
+│   │   ├── README.md
+│   │   ├── base_publica.csv
+│   │   └── resultados.md
+│   │
+│   ├── tjdft/
+│   │   ├── README.md
+│   │   ├── base_publica.csv
+│   │   └── resultados.md
+│   │
+│   └── comparacao/
+│       ├── quadro_comparativo.csv
+│       └── sintese_comparativa.md
+│
+├── 08_fontes_institucionais/
+│   ├── README.md
+│   ├── legislacao.csv
+│   ├── politicas_publicas.csv
+│   ├── planos_e_programas.csv
+│   ├── relatorios_institucionais.csv
+│   ├── fontes_estatisticas.csv
+│   └── portais_consultados.md
+│
+├── 09_dados/
+│   ├── README.md
+│   │
+│   ├── publicos/
+│   │   ├── brutos/
+│   │   ├── tratados/
+│   │   ├── agregados/
+│   │   └── amostras/
+│   │
+│   ├── dicionarios/
+│   │   ├── dicionario_de_dados.csv
+│   │   ├── categorias_analiticas.csv
+│   │   └── classificacoes.csv
+│   │
+│   ├── metadados/
+│   │   ├── proveniencia_dos_dados.md
+│   │   ├── datas_de_coleta.csv
+│   │   └── controle_de_qualidade.md
+│   │
+│   └── restritos/
+│       └── README.md
+│
+├── 10_scripts/
+│   ├── README.md
+│   ├── requirements.txt
+│   │
+│   ├── coleta/
+│   ├── limpeza/
+│   ├── classificacao/
+│   ├── analise/
+│   ├── visualizacao/
+│   └── testes/
+│
+├── 11_cadernos_de_pesquisa/
+│   ├── README.md
+│   ├── diario_de_pesquisa.md
+│   ├── decisoes_metodologicas.md
+│   ├── alteracoes_de_escopo.md
+│   ├── problemas_encontrados.md
+│   ├── reunioes_e_orientacoes.md
+│   └── agenda_de_pesquisa.md
+│
+├── 12_resultados/
+│   ├── README.md
+│   ├── resultados_preliminares.md
+│   ├── tabelas/
+│   ├── graficos/
+│   ├── mapas/
+│   ├── quadros_analiticos/
+│   └── sinteses/
+│
+├── 13_produtos/
+│   ├── relatorios/
+│   ├── artigos/
+│   ├── apresentacoes/
+│   ├── resumos_executivos/
+│   ├── notas_tecnicas/
+│   └── tese/
+│
+├── 14_referencias/
+│   ├── referencias.bib
+│   ├── referencias_abnt.md
+│   ├── bibliografia_essencial.md
+│   └── fontes_por_eixo.md
+│
+└── docs/
+    ├── index.md
+    ├── projeto.md
+    ├── metodologia.md
+    ├── andamento.md
+    ├── dados.md
+    ├── resultados.md
+    ├── produtos.md
+    └── sobre.md</pre></div>
+
+
+<h2>Organização das três versões</h2>
+
+<p>Como <code>Projeto.pdf</code> é a terceira versão, a correspondência inicial pode ser registrada assim:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/arquivos_originais/Projeto.pdf
+→ 01_projeto/versoes/v03/projeto_v03.pdf</pre></div>
+
+
+<p>O arquivo <code>Projeto 2.pdf</code> apresenta uma formulação anterior, centrada na identificação dos fatores associados às mortes violentas e na relação entre produção jurídica baseada em evidências, reparação e justiça restaurativa. fileciteturn0file2 Ele deve permanecer preservado, mas sua posição como V1 ou V2 dependerá da confirmação da cronologia.</p>
+
+<p>O arquivo <code>Projeto-1.pdf</code> possui, no conteúdo extraído, a mesma formulação da terceira versão. fileciteturn0file1 Assim, pode ser mantido em <code>arquivos_originais</code>, com anotação de que se trata de cópia ou arquivo equivalente, evitando tratá-lo como versão independente.</p>
+
+<h2>Histórico de versões</h2>
+
+<p>O arquivo <code>01_projeto/historico_de_versoes.md</code> pode ter esta estrutura:</p>
+
+<p>```markdown</p>
+<h1>Histórico de versões do projeto</h1>
+
+<h2>Versão 1</h2>
+
+<p><strong>Data:</strong> a preencher.</p>
+
+<p><strong>Arquivo original:</strong> a identificar.</p>
+
+<p>**Características</p></div></div>
+    <div class="message user-message"><div class="content"><p>considere o "Projeto.pdf" como o atual</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Considerarei <strong><code>Projeto.pdf</code> como a versão atual e oficial do projeto</strong>.</p>
+
+<p>No repositório, ele deve aparecer assim:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/
+├── projeto_atual/
+│   ├── Projeto.pdf
+│   └── README.md
+│
+├── versoes_anteriores/
+│   ├── Projeto-1.pdf
+│   └── Projeto 2.pdf
+│
+└── historico_de_versoes.md</pre></div>
+
+
+<p>O <code>README.md</code> da pasta <code>projeto_atual</code> pode registrar:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section"># Projeto atual</span>
+
+O arquivo <span class="hljs-code">`Projeto.pdf`</span> corresponde à versão atual e de referência da pesquisa.
+
+As versões anteriores permanecem arquivadas exclusivamente para fins de
+rastreabilidade, memória metodológica e acompanhamento da evolução do projeto.</pre></div>
+
+
+<p>Assim, evitamos chamar o arquivo atual de “V3” na navegação principal, embora o histórico possa registrar que ele corresponde à terceira formulação do projeto.</p></div></div>
+    <div class="message user-message"><div class="content"><p>agora refaça</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>A estrutura deve assumir <strong><code>Projeto.pdf</code> como a versão atual e oficial da pesquisa</strong>, mantendo os demais arquivos apenas como memória da evolução do projeto. O projeto atual articula mortes violentas de crianças e adolescentes, fatores de risco, rede de proteção do Distrito Federal, prioridade absoluta, análise jurisprudencial e estudo de caso. fileciteturn0file0</p>
+
+<h2>Nome sugerido do repositório</h2>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">mortes-violentas-infancia-df</pre></div>
+
+
+<p>Descrição:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Repositório público da pesquisa sobre mortes violentas de crianças e
+adolescentes, rede de proteção e prioridade absoluta no Distrito Federal.</pre></div>
+
+
+<h2>Estrutura revisada</h2>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">mortes-violentas-infancia-df/
+│
+├── README.md
+├── LICENSE
+├── CITATION.cff
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── .gitignore
+│
+├── 01_projeto/
+│   ├── README.md
+│   │
+│   ├── atual/
+│   │   ├── Projeto.pdf
+│   │   ├── projeto_atual.md
+│   │   └── ficha_do_projeto.md
+│   │
+│   ├── versoes_anteriores/
+│   │   ├── Projeto-1.pdf
+│   │   ├── Projeto 2.pdf
+│   │   └── README.md
+│   │
+│   └── historico_de_versoes.md
+│
+├── 02_planejamento/
+│   ├── README.md
+│   ├── problema_de_pesquisa.md
+│   ├── perguntas_de_pesquisa.md
+│   ├── objetivos.md
+│   ├── hipotese.md
+│   ├── justificativa.md
+│   ├── delimitacao_da_pesquisa.md
+│   ├── cronograma.md
+│   └── etapas_da_pesquisa.md
+│
+├── 03_marco_teorico/
+│   ├── README.md
+│   ├── mapa_do_marco_teorico.md
+│   │
+│   ├── necropolitica/
+│   │   ├── README.md
+│   │   ├── achille_mbembe.md
+│   │   └── dialogos_nacionais.md
+│   │
+│   ├── territorio/
+│   │   ├── README.md
+│   │   ├── territorio_usado.md
+│   │   ├── estado_e_periferia.md
+│   │   └── desigualdades_territoriais.md
+│   │
+│   ├── direito_estado_e_morte/
+│   │   ├── README.md
+│   │   ├── teorias_criticas_do_direito.md
+│   │   └── producao_juridica_da_morte.md
+│   │
+│   ├── prioridade_absoluta/
+│   │   ├── README.md
+│   │   ├── fundamento_constitucional.md
+│   │   └── prioridade_como_categoria_analitica.md
+│   │
+│   └── rede_de_protecao/
+│       ├── README.md
+│       ├── conceito_de_rede.md
+│       └── protecao_e_prevencao.md
+│
+├── 04_revisao_de_literatura/
+│   ├── README.md
+│   ├── protocolo_de_revisao.md
+│   ├── estrategia_de_busca.md
+│   ├── descritores.md
+│   ├── bases_consultadas.md
+│   ├── criterios_de_inclusao_exclusao.md
+│   ├── fluxo_de_selecao.md
+│   │
+│   ├── fichamentos/
+│   │   ├── violencia_letal/
+│   │   ├── infancia_e_adolescencia/
+│   │   ├── necropolitica/
+│   │   ├── prioridade_absoluta/
+│   │   ├── territorio/
+│   │   └── redes_de_protecao/
+│   │
+│   ├── banco_bibliografico.csv
+│   ├── literatura_incluida.csv
+│   └── literatura_excluida.csv
+│
+├── 05_metodologia/
+│   ├── README.md
+│   ├── desenho_da_pesquisa.md
+│   ├── abordagem_multimetodo.md
+│   ├── unidades_de_analise.md
+│   ├── recorte_temporal.md
+│   ├── recorte_territorial.md
+│   ├── fontes_de_dados.md
+│   ├── procedimentos_de_coleta.md
+│   ├── procedimentos_de_tratamento.md
+│   ├── procedimentos_de_analise.md
+│   ├── criterios_de_validacao.md
+│   ├── limitacoes.md
+│   └── etica_e_protecao_de_dados.md
+│
+├── 06_mortes_violentas/
+│   ├── README.md
+│   ├── definicao_conceitual.md
+│   ├── definicao_operacional.md
+│   ├── tipologia_das_mortes.md
+│   ├── fatores_de_risco.md
+│   ├── grupos_vitimizados.md
+│   ├── territorios.md
+│   ├── comparacao_nacional.md
+│   ├── comparacao_internacional.md
+│   └── indicadores.md
+│
+├── 07_rede_de_protecao/
+│   ├── README.md
+│   ├── mapa_da_rede.md
+│   │
+│   ├── instituicoes/
+│   │   ├── cldf.md
+│   │   ├── suas.md
+│   │   ├── sus.md
+│   │   ├── secretarias_gdf.md
+│   │   ├── sistema_de_justica.md
+│   │   └── movimentos_sociais.md
+│   │
+│   ├── politicas_publicas.md
+│   ├── programas_e_acoes.md
+│   ├── prioridades_institucionais.md
+│   ├── fluxos_de_protecao.md
+│   ├── praticas_de_prevencao.md
+│   ├── lacunas_de_protecao.md
+│   └── quadro_da_rede.csv
+│
+├── 08_prioridade_absoluta/
+│   ├── README.md
+│   ├── base_constitucional.md
+│   ├── base_legal.md
+│   ├── categorias_de_analise.md
+│   ├── prioridade_absoluta_e_politicas_publicas.md
+│   ├── prioridade_absoluta_e_mortes_violentas.md
+│   └── limites_da_categoria_juridica.md
+│
+├── 09_jurisprudencia/
+│   ├── README.md
+│   ├── protocolo_de_pesquisa.md
+│   ├── termos_de_busca.md
+│   ├── criterios_de_inclusao_exclusao.md
+│   ├── livro_de_codigos.md
+│   ├── dicionario_de_variaveis.csv
+│   │
+│   ├── stf/
+│   │   ├── README.md
+│   │   ├── base_publica.csv
+│   │   ├── categorias_identificadas.md
+│   │   └── resultados.md
+│   │
+│   ├── stj/
+│   │   ├── README.md
+│   │   ├── base_publica.csv
+│   │   ├── categorias_identificadas.md
+│   │   └── resultados.md
+│   │
+│   ├── tjdft/
+│   │   ├── README.md
+│   │   ├── base_publica.csv
+│   │   ├── categorias_identificadas.md
+│   │   └── resultados.md
+│   │
+│   └── comparacao/
+│       ├── quadro_comparativo.csv
+│       ├── convergencias.md
+│       ├── divergencias.md
+│       └── sintese_interpretativa.md
+│
+├── 10_estudo_de_caso/
+│   ├── README.md
+│   ├── protocolo_do_estudo_de_caso.md
+│   ├── criterios_de_selecao.md
+│   ├── fontes_utilizadas.md
+│   ├── cronologia_anonimizada.md
+│   ├── contexto_social.md
+│   ├── contexto_territorial.md
+│   ├── contexto_institucional.md
+│   ├── resposta_da_rede_de_protecao.md
+│   ├── analise_juridica.md
+│   ├── analise_necropolitica.md
+│   └── limites_do_estudo.md
+│
+├── 11_fontes/
+│   ├── README.md
+│   ├── fontes_estatisticas.csv
+│   ├── fontes_normativas.csv
+│   ├── fontes_jurisprudenciais.csv
+│   ├── fontes_institucionais.csv
+│   ├── fontes_bibliograficas.csv
+│   ├── portais_consultados.md
+│   └── registro_de_acesso.csv
+│
+├── 12_dados/
+│   ├── README.md
+│   │
+│   ├── publicos/
+│   │   ├── brutos/
+│   │   ├── intermediarios/
+│   │   ├── tratados/
+│   │   ├── agregados/
+│   │   └── amostras/
+│   │
+│   ├── dicionarios/
+│   │   ├── dicionario_de_dados.csv
+│   │   ├── categorias_analiticas.csv
+│   │   ├── classificacao_de_mortes.csv
+│   │   └── classificacao_territorial.csv
+│   │
+│   ├── metadados/
+│   │   ├── proveniencia_dos_dados.md
+│   │   ├── datas_de_coleta.csv
+│   │   ├── transformacoes_realizadas.md
+│   │   └── controle_de_qualidade.md
+│   │
+│   └── restritos/
+│       └── README.md
+│
+├── 13_scripts/
+│   ├── README.md
+│   ├── requirements.txt
+│   ├── coleta/
+│   ├── limpeza/
+│   ├── padronizacao/
+│   ├── classificacao/
+│   ├── analise/
+│   ├── visualizacao/
+│   └── testes/
+│
+├── 14_caderno_de_pesquisa/
+│   ├── README.md
+│   ├── diario_de_pesquisa.md
+│   ├── decisoes_metodologicas.md
+│   ├── alteracoes_de_escopo.md
+│   ├── registro_de_reunioes.md
+│   ├── problemas_e_solucoes.md
+│   ├── pendencias.md
+│   └── agenda_de_pesquisa.md
+│
+├── 15_resultados/
+│   ├── README.md
+│   ├── resultados_preliminares.md
+│   ├── resultados_consolidados.md
+│   ├── tabelas/
+│   ├── graficos/
+│   ├── mapas/
+│   ├── quadros_analiticos/
+│   └── sinteses/
+│
+├── 16_produtos/
+│   ├── README.md
+│   ├── relatorios/
+│   ├── artigos/
+│   ├── apresentacoes/
+│   ├── notas_tecnicas/
+│   ├── resumos_executivos/
+│   ├── materiais_de_divulgacao/
+│   └── tese/
+│
+├── 17_referencias/
+│   ├── referencias.bib
+│   ├── referencias_abnt.md
+│   ├── bibliografia_essencial.md
+│   └── bibliografia_por_eixo.md
+│
+└── docs/
+    ├── index.md
+    ├── projeto.md
+    ├── metodologia.md
+    ├── andamento.md
+    ├── dados.md
+    ├── resultados.md
+    ├── produtos.md
+    └── sobre.md</pre></div>
+
+
+<h2>Organização do projeto atual</h2>
+
+<p>O arquivo principal deve aparecer em uma pasta própria, sem ser renomeado como “V3” na navegação pública:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/atual/Projeto.pdf</pre></div>
+
+
+<p>O arquivo <code>01_projeto/atual/projeto_atual.md</code> pode apresentar a versão em texto, facilitando a leitura diretamente no GitHub.</p>
+
+<p>O arquivo <code>ficha_do_projeto.md</code> deve sintetizar:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section"># Ficha do projeto</span>
+
+<span class="hljs-strong">**Título:**</span> Mortes violentas de crianças e adolescentes e as práticas
+de proteção e prevenção no Distrito Federal
+
+<span class="hljs-strong">**Situação:**</span> Projeto atual
+
+<span class="hljs-strong">**Documento de referência:**</span> Projeto.pdf
+
+<span class="hljs-strong">**Tema:**</span> Mortes violentas de crianças e adolescentes no Distrito Federal
+
+<span class="hljs-strong">**Eixos principais:**</span>
+<span class="hljs-bullet">-</span> mortes violentas e fatores de risco;
+<span class="hljs-bullet">-</span> grupos e territórios afetados;
+<span class="hljs-bullet">-</span> rede de proteção do Distrito Federal;
+<span class="hljs-bullet">-</span> princípio constitucional da prioridade absoluta;
+<span class="hljs-bullet">-</span> jurisprudência do STF, STJ e TJDFT;
+<span class="hljs-bullet">-</span> estudo de caso.
+
+<span class="hljs-strong">**Metodologia:**</span> Pesquisa empírica multimétodo.</pre></div>
+
+
+<h2>Versões anteriores</h2>
+
+<p>Os arquivos anteriores devem ser preservados sem receber, por enquanto, uma numeração cronológica definitiva:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/versoes_anteriores/
+├── Projeto-1.pdf
+├── Projeto 2.pdf
+└── README.md</pre></div>
+
+
+<p><code>Projeto 2.pdf</code> apresenta uma formulação anterior, mais concentrada nos fatores associados às mortes violentas, na produção jurídica baseada em evidências e na justiça restaurativa. fileciteturn0file2</p>
+
+<p>O conteúdo de <code>Projeto-1.pdf</code> coincide substancialmente com o projeto atual, devendo ser preservado como arquivo anterior ou cópia de trabalho, sem ser apresentado como versão autônoma até que sua origem seja esclarecida. fileciteturn0file1</p>
+
+<h2>Estrutura do README principal</h2>
+
+<p>O <code>README.md</code> da raiz deve conter:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section"># Mortes violentas de crianças e adolescentes no Distrito Federal</span>
+
+Este repositório documenta o desenvolvimento da pesquisa sobre mortes
+violentas de crianças e adolescentes, fatores de risco, práticas da rede
+de proteção e aplicação do princípio constitucional da prioridade absoluta
+no Distrito Federal.
+
+<span class="hljs-section">## Projeto atual</span>
+
+O documento oficial e atualmente utilizado na pesquisa está disponível em:
+
+<span class="hljs-code">`01_projeto/atual/Projeto.pdf`</span>
+
+<span class="hljs-section">## Pergunta central</span>
+
+Como a rede de proteção a crianças e adolescentes do Distrito Federal
+organiza suas prioridades de proteção diante de mortes violentas, e de
+que forma essas prioridades se relacionam com o princípio constitucional
+da prioridade absoluta?
+
+<span class="hljs-section">## Eixos da pesquisa</span>
+
+<span class="hljs-bullet">-</span> mortes violentas e fatores de risco;
+<span class="hljs-bullet">-</span> grupos e territórios afetados;
+<span class="hljs-bullet">-</span> rede de proteção;
+<span class="hljs-bullet">-</span> prioridade absoluta;
+<span class="hljs-bullet">-</span> jurisprudência;
+<span class="hljs-bullet">-</span> estudo de caso.
+
+<span class="hljs-section">## Organização do repositório</span>
+
+<span class="hljs-bullet">-</span> <span class="hljs-code">`01_projeto`</span>: projeto atual e versões anteriores;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`03_marco_teorico`</span>: fundamentos teóricos;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`04_revisao_de_literatura`</span>: protocolo e fichamentos;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`05_metodologia`</span>: desenho e procedimentos;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`06_mortes_violentas`</span>: dados e categorias sobre vitimização;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`07_rede_de_protecao`</span>: instituições e políticas;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`08_prioridade_absoluta`</span>: base normativa e analítica;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`09_jurisprudencia`</span>: STF, STJ e TJDFT;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`10_estudo_de_caso`</span>: protocolo e análise;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`12_dados`</span>: bases públicas e metadados;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`14_caderno_de_pesquisa`</span>: registro do processo;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`15_resultados`</span>: achados preliminares e consolidados;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`16_produtos`</span>: relatórios, artigos e tese.
+
+<span class="hljs-section">## Situação da pesquisa</span>
+
+Pesquisa em desenvolvimento. Os dados, protocolos e resultados poderão
+ser atualizados, corrigidos ou ampliados ao longo da investigação.</pre></div>
+
+
+<h2>Materiais públicos e restritos</h2>
+
+<p>O repositório público deve conter:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">protocolos metodológicos
+referências bibliográficas
+bases anonimizadas ou agregadas
+scripts
+quadros comparativos
+resultados preliminares
+relatórios e produtos autorizados
+diário metodológico</pre></div>
+
+
+<p>Não devem ser publicados:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">dados pessoais
+documentos de crianças ou familiares
+informações que permitam reidentificação
+documentos institucionais restritos
+credenciais e chaves de acesso
+arquivos protegidos por direitos autorais
+notas pessoais sensíveis
+bases integrais sem autorização de redistribuição</pre></div>
+
+
+<p>A pasta <code>12_dados/restritos/</code> deve conter apenas um <code>README.md</code> explicativo. Os dados restritos propriamente ditos devem permanecer fora do GitHub e ser incluídos no <code>.gitignore</code>.</p></div></div>
+    <div class="message user-message"><div class="content"><p>aqui o readem</p>
+<h1>Pesquisa de Mestrado</h1>
+<p>Este repositório vai funcionar como um caderno público de pesquisa de Chico Antônio Rosa, estudante de Mestrado em Direito na Universidade de Brasília.</p>
+
+<h2>Fase atual</h2>
+<p>Pesquisa exploratória e definições iniciais.</p>
+
+<h2>Tema</h2>
+<p>Mortes violentas de crianças e adolescentes no Distrito Federal.</p>
+
+<h2>Estrutura do repositório (rascunho)</h2>
+<p>│</p>
+<p>├── README.md</p>
+<p>├── LICENSE</p>
+<p>│</p>
+<p>├── 01_projeto/</p>
+<p>│   ├── versoes/</p>
+<p>│     ├── projeto_pesquisa_v01.pdf</p>
+<p>│     └── projeto_pesquisa_v02.pdf</p>
+<p>│     </p>
+<p>│   ├── projeto_atual.pdf</p>
+<p>│   ├── problema_de_pesquisa.md</p>
+<p>│   ├── objetivos.md</p>
+<p>│   ├── delimitacao_conceitual.md</p>
+<p>│   ├── escopo_geografico.md</p>
+<p>│   └── cronograma.md</p>
+<p>│</p>
+<p>├── 02_metodologia/</p>
+<p>│   </p>
+<p>├── 03_fontes/</p>
+<p>│   </p>
+<p>├── 04_dados/</p>
+<p>│   </p>
+<p>├── 05_scripts/</p>
+<p>│   ├── coleta</p>
+<p>│</p>
+<p>├── 06_cadernos_de_pesquisa/</p>
+<p>│   ├── diario_de_pesquisa.md</p>
+<p>│   ├── decisoes_metodologicas.md</p>
+<p>│   └── registro_de_alteracoes.md</p>
+<p>│</p>
+<p>├── 07_resultados/</p>
+<p>│   </p>
+<p>├── 08_relatorios/</p>
+<p>│   </p>
+<p>├── 09_referencias/</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Abaixo está uma versão revisada, com linguagem mais institucional, estrutura Markdown correta e organização compatível com o estágio inicial da pesquisa.</p>
+
+<p>:::writing{variant="document" id="48317"}</p>
+<h1>Pesquisa de Mestrado</h1>
+
+<p>Este repositório funciona como um <strong>caderno público de pesquisa</strong> de <strong>Chico Antônio Rosa</strong>, estudante do Mestrado em Direito da Universidade de Brasília — UnB.</p>
+
+<p>O objetivo é registrar e publicizar, de forma progressiva, o desenvolvimento da pesquisa, incluindo suas versões, escolhas metodológicas, fontes, procedimentos de coleta e análise, resultados preliminares e produtos acadêmicos.</p>
+
+<h2>Fase atual</h2>
+
+<p>A pesquisa encontra-se em fase exploratória, com desenvolvimento das definições conceituais, delimitação do objeto, identificação das fontes e elaboração dos procedimentos metodológicos.</p>
+
+<h2>Tema</h2>
+
+<p><strong>Mortes violentas de crianças e adolescentes no Distrito Federal.</strong></p>
+
+<h2>Objetivos do repositório</h2>
+
+<p>O repositório pretende:</p>
+
+<ul><li>documentar a evolução do projeto de pesquisa;</li><li>registrar decisões teóricas e metodológicas;</li><li>organizar as fontes utilizadas;</li><li>armazenar bases de dados e scripts passíveis de divulgação;</li><li>apresentar resultados preliminares e consolidados;</li><li>favorecer a transparência e a reprodutibilidade da pesquisa;</li><li>preservar a memória do processo de investigação.</li></ul>
+
+<h2>Projeto atual</h2>
+
+<p>A versão atualmente adotada como referência está disponível em:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/projeto_atual.pdf</pre></div>
+
+
+<p>As formulações anteriores estão preservadas na pasta:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/versoes/</pre></div>
+
+
+<h2>Estrutura do repositório</h2>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">.
+├── README.md
+├── LICENSE
+│
+├── 01_projeto/
+│   ├── versoes/
+│   │   ├── projeto_pesquisa_v01.pdf
+│   │   └── projeto_pesquisa_v02.pdf
+│   │
+│   ├── projeto_atual.pdf
+│   ├── problema_de_pesquisa.md
+│   ├── objetivos.md
+│   ├── delimitacao_conceitual.md
+│   ├── escopo_geografico.md
+│   └── cronograma.md
+│
+├── 02_metodologia/
+│   ├── README.md
+│   ├── desenho_da_pesquisa.md
+│   ├── procedimentos_de_coleta.md
+│   ├── procedimentos_de_analise.md
+│   └── limitacoes.md
+│
+├── 03_fontes/
+│   ├── README.md
+│   ├── fontes_bibliograficas.csv
+│   ├── fontes_estatisticas.csv
+│   ├── fontes_normativas.csv
+│   ├── fontes_jurisprudenciais.csv
+│   └── fontes_institucionais.csv
+│
+├── 04_dados/
+│   ├── README.md
+│   ├── brutos/
+│   ├── tratados/
+│   ├── agregados/
+│   └── dicionario_de_dados.csv
+│
+├── 05_scripts/
+│   ├── README.md
+│   ├── coleta/
+│   ├── tratamento/
+│   ├── analise/
+│   └── visualizacao/
+│
+├── 06_cadernos_de_pesquisa/
+│   ├── README.md
+│   ├── diario_de_pesquisa.md
+│   ├── decisoes_metodologicas.md
+│   └── registro_de_alteracoes.md
+│
+├── 07_resultados/
+│   ├── README.md
+│   ├── resultados_preliminares.md
+│   ├── tabelas/
+│   ├── graficos/
+│   └── mapas/
+│
+├── 08_relatorios/
+│   ├── README.md
+│   ├── relatorios_parciais/
+│   ├── apresentacoes/
+│   └── relatorio_final/
+│
+└── 09_referencias/
+    ├── README.md
+    ├── referencias.bib
+    └── referencias_abnt.md</pre></div>
+
+
+<h2>Descrição das pastas</h2>
+
+<h3><code>01_projeto</code></h3>
+
+<p>Reúne o projeto atual, suas versões anteriores e os documentos relacionados à formulação do problema, aos objetivos, à delimitação conceitual, ao escopo geográfico e ao cronograma.</p>
+
+<h3><code>02_metodologia</code></h3>
+
+<p>Apresenta o desenho da pesquisa, os procedimentos de coleta, tratamento e análise dos dados, bem como as limitações metodológicas identificadas ao longo da investigação.</p>
+
+<h3><code>03_fontes</code></h3>
+
+<p>Organiza as fontes bibliográficas, estatísticas, normativas, jurisprudenciais e institucionais utilizadas na pesquisa.</p>
+
+<h3><code>04_dados</code></h3>
+
+<p>Armazena as bases de dados públicas ou passíveis de divulgação, acompanhadas de documentação sobre sua origem, estrutura, tratamento e limitações.</p>
+
+<h3><code>05_scripts</code></h3>
+
+<p>Reúne os códigos utilizados na coleta, organização, tratamento, análise e visualização dos dados.</p>
+
+<h3><code>06_cadernos_de_pesquisa</code></h3>
+
+<p>Registra o desenvolvimento cotidiano da pesquisa, as decisões metodológicas, as alterações de escopo, os problemas encontrados e as soluções adotadas.</p>
+
+<h3><code>07_resultados</code></h3>
+
+<p>Apresenta resultados preliminares e consolidados, incluindo tabelas, gráficos, mapas e sínteses analíticas.</p>
+
+<h3><code>08_relatorios</code></h3>
+
+<p>Reúne relatórios parciais, apresentações acadêmicas e, posteriormente, o relatório ou texto final da pesquisa.</p>
+
+<h3><code>09_referencias</code></h3>
+
+<p>Organiza as referências bibliográficas utilizadas, preferencialmente em formatos compatíveis com gerenciadores de referências e com as normas da Associação Brasileira de Normas Técnicas — ABNT.</p>
+
+<h2>Atualizações</h2>
+
+<p>O conteúdo deste repositório será atualizado progressivamente, de acordo com o avanço da pesquisa.</p>
+
+<p>Por se tratar de uma investigação em desenvolvimento, documentos, categorias, procedimentos metodológicos e resultados preliminares poderão ser corrigidos, reformulados ou ampliados.</p>
+
+<h2>Dados e informações sensíveis</h2>
+
+<p>O repositório não deverá conter dados pessoais, informações que permitam a identificação de crianças, adolescentes, familiares ou outras pessoas envolvidas nos casos estudados.</p>
+
+<p>Bases restritas, documentos sigilosos, materiais institucionais de circulação limitada e arquivos protegidos por direitos autorais não serão disponibilizados publicamente.</p>
+
+<h2>Autoria</h2>
+
+<p><strong>Chico Antônio Rosa</strong>  </p>
+<p>Mestrando em Direito  </p>
+<p>Universidade de Brasília — UnB</p>
+
+<h2>Licença</h2>
+
+<p>A licença aplicável aos textos, dados e códigos deste repositório será definida de acordo com a natureza de cada material e com as eventuais restrições jurídicas, éticas e institucionais incidentes.</p>
+<p>:::</p>
+
+<p>A principal melhoria foi separar a <strong>estrutura física do repositório</strong> da explicação sobre a finalidade de cada pasta, mantendo o README legível mesmo quando o projeto crescer.</p></div></div>
+    <div class="message user-message"><div class="content"><p>a estrutura ta aparecendo assim no readme</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Isso acontece porque a árvore foi inserida como texto comum. No Markdown, espaços e quebras de linha consecutivos são normalizados. Para preservar a estrutura, coloque todo o conteúdo entre três crases, usando <code>text</code>.</p>
+
+<p>Use assim no <code>README.md</code>:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section">## Estrutura do repositório (rascunho)</span>
+
+<span class="hljs-code">```text
+.
+├── README.md
+├── LICENSE
+│
+├── 01_projeto/
+│   ├── versoes/
+│   │   ├── projeto_pesquisa_v01.pdf
+│   │   └── projeto_pesquisa_v02.pdf
+│   │
+│   ├── projeto_atual.pdf
+│   ├── problema_de_pesquisa.md
+│   ├── objetivos.md
+│   ├── delimitacao_conceitual.md
+│   ├── escopo_geografico.md
+│   └── cronograma.md
+│
+├── 02_metodologia/
+│
+├── 03_fontes/
+│
+├── 04_dados/
+│
+├── 05_scripts/
+│   └── coleta/
+│
+├── 06_cadernos_de_pesquisa/
+│   ├── diario_de_pesquisa.md
+│   ├── decisoes_metodologicas.md
+│   └── registro_de_alteracoes.md
+│
+├── 07_resultados/
+│
+├── 08_relatorios/
+│
+└── 09_referencias/
+```</span></pre></div>
+
+
+<p>No arquivo real, devem aparecer apenas três crases antes de <code>text</code> e três crases depois da árvore:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"></pre></div>
+<p>text</p>
+<p>conteúdo da estrutura</p>
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">plaintext</span></div><pre class="code-block hljs"></pre></div>
+
+
+<p>Também corrigi a hierarquia da pasta <code>versoes</code>, que precisa ter uma linha vertical própria:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">├── 01_projeto/
+│   ├── versoes/
+│   │   ├── projeto_pesquisa_v01.pdf
+│   │   └── projeto_pesquisa_v02.pdf</pre></div>
+
+
+<p>Sem o bloco de código, o GitHub continuará exibindo a estrutura em uma única sequência horizontal.</p></div></div>
+    <div class="message user-message"><div class="content"><p>como digita estas aspas? no meu teclado só tem assim ' e assim "</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Isso não é aspas; é a <strong>crase</strong> ou <strong>backtick</strong>:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">`</pre></div>
+
+
+<p>No teclado brasileiro ABNT2, ela costuma ficar na tecla à direita do <strong>P</strong>, junto do acento agudo. Para digitá-la sozinha:</p>
+
+<ol><li>pressione a tecla da crase;</li><li>pressione a barra de espaço.</li></ol>
+
+<p>Para abrir e fechar o bloco no GitHub, digite três vezes:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">```text
+sua estrutura aqui
+```</pre></div>
+
+
+<p>Também pode simplesmente copiar daqui:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs"></pre></div>
+
+<p>```</p></div></div>
+    <div class="message user-message"><div class="content"><p>para criar pastas dentro de um repositório faz como?</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>No GitHub pelo navegador, você cria uma pasta ao criar um arquivo dentro dela. O Git/GitHub não mantém pastas vazias.</p>
+
+<ol><li>Abra o repositório.</li><li>Clique em <strong>Add file</strong>.</li><li>Selecione <strong>Create new file</strong>.</li><li>No campo do nome, escreva o caminho completo, usando <code>/</code>.</li></ol>
+
+<p>Exemplo:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/problema_de_pesquisa.md</pre></div>
+
+
+<p>O GitHub criará automaticamente a pasta <code>01_projeto</code> e, dentro dela, o arquivo <code>problema_de_pesquisa.md</code>.</p>
+
+<p>Para criar uma subpasta:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">01_projeto/versoes/projeto_pesquisa_v01.pdf</pre></div>
+
+
+<p>Para uma pasta que ainda não terá conteúdo, crie nela um arquivo <code>README.md</code>:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">02_metodologia/README.md</pre></div>
+
+
+<p>Depois:</p>
+
+<ol><li>Escreva algum conteúdo no arquivo.</li><li>Clique em <strong>Commit changes</strong>.</li><li>Confirme novamente em <strong>Commit changes</strong>.</li></ol>
+
+<p>O uso da barra <code>/</code> no nome do arquivo é o recurso oficial para criar subdiretórios pela interface do GitHub. <sup class="cite">[<a href="https://docs.github.com/en/repositories/working-with-files/managing-files/creating-new-files?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Creating new files - GitHub Docs">GitHub Docs</a>]</sup></p>
+
+<p>Para enviar um PDF, crie primeiro a pasta com um <code>README.md</code>; depois entre nela, clique em <strong>Add file → Upload files</strong> e selecione o PDF. Também é possível arrastar uma pasta inteira para a área de upload. <sup class="cite">[<a href="https://docs.github.com/en/repositories/working-with-files/managing-files/adding-a-file-to-a-repository?platform=windows&source=post_page---------------------------&utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Adding a file to a repository - GitHub Docs">GitHub Docs</a>]</sup></p></div></div>
+    <div class="message user-message"><div class="content"><p>e como excluo um branch</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Pelo navegador:</p>
+
+<ol><li>Abra o repositório.</li><li>Clique no seletor de branch, onde normalmente aparece <code>main</code>.</li><li>Clique em <strong>View all branches</strong>.</li><li>Localize a branch que deseja excluir.</li><li>Clique no ícone de lixeira ao lado dela.</li><li>Confirme a exclusão, caso o GitHub apresente o aviso. <sup class="cite">[<a href="https://docs.github.com/pt/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-and-deleting-branches-within-your-repository?source=post_page---------------------------" target="_blank" rel="noopener" class="cite-num" title="Managing branches within your repository - Documentos do GitHub">GitHub Docs</a>]</sup></li></ol>
+
+<p>Atenção: você não pode excluir a branch padrão do repositório. Para excluir a <code>main</code>, por exemplo, primeiro precisa definir outra branch como padrão em <strong>Settings → Default branch</strong>. <sup class="cite">[<a href="https://docs.github.com/pt/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-and-deleting-branches-within-your-repository?source=post_page---------------------------" target="_blank" rel="noopener" class="cite-num" title="Managing branches within your repository - Documentos do GitHub">GitHub Docs</a>]</sup></p>
+
+<p>Pelo terminal, o comando é:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">bash</span></div><pre class="code-block hljs">git push origin --delete nome-da-branch</pre></div>
+
+
+<p>Exemplo:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">bash</span></div><pre class="code-block hljs">git push origin --delete teste</pre></div>
+</div></div>
+    <div class="message user-message"><div class="content"><p>quero acrescentar o histórico do chat com o perplexity onde lapidei o projeto para passar da versão 02 para a 03</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Para registrar especificamente o processo de passagem da <strong>versão 02 para a versão 03 — atual</strong>, o histórico do Perplexity deve ficar dentro de <code>01_projeto</code>, e não apenas no caderno geral de pesquisa. Ele documenta diretamente a reformulação do projeto.</p>
+
+<h2>Estrutura recomendada</h2>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">├── 01_projeto/
+│   ├── versoes/
+│   │   ├── projeto_pesquisa_v01.pdf
+│   │   └── projeto_pesquisa_v02.pdf
+│   │
+│   ├── processo_de_revisao/
+│   │   └── v02_para_v03/
+│   │       ├── README.md
+│   │       ├── historico_chat_perplexity.md
+│   │       ├── sintese_das_alteracoes.md
+│   │       ├── quadro_comparativo_v02_v03.csv
+│   │       └── arquivos_originais/
+│   │           └── exportacao_chat_perplexity.pdf
+│   │
+│   ├── projeto_atual.pdf
+│   ├── problema_de_pesquisa.md
+│   ├── objetivos.md
+│   ├── delimitacao_conceitual.md
+│   ├── escopo_geografico.md
+│   └── cronograma.md</pre></div>
+
+
+<h2>Função de cada arquivo</h2>
+
+<h3><code>historico_chat_perplexity.md</code></h3>
+
+<p>Versão legível do diálogo, organizada em Markdown. Pode preservar a sequência de perguntas e respostas, mas convém retirar:</p>
+
+<ul><li>informações pessoais desnecessárias;</li><li>dados institucionais restritos;</li><li>links privados;</li><li>credenciais ou chaves;</li><li>trechos de obras protegidas reproduzidos integralmente;</li><li>partes repetitivas ou sem relação com a revisão do projeto.</li></ul>
+
+<p>Use uma estrutura como:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section"># Histórico de elaboração — versão 02 para versão 03</span>
+
+<span class="hljs-section">## Identificação</span>
+
+<span class="hljs-strong">**Plataforma utilizada:**</span> Perplexity  
+<span class="hljs-strong">**Finalidade:**</span> apoio exploratório à reformulação do projeto de pesquisa  
+<span class="hljs-strong">**Período do diálogo:**</span> [inserir datas]  
+<span class="hljs-strong">**Versões relacionadas:**</span> projeto de pesquisa v02 e projeto atual, correspondente à v03
+
+<span class="hljs-section">## Nota de transparência</span>
+
+Este documento registra o uso de uma ferramenta de inteligência artificial
+durante a fase exploratória de revisão do projeto. As decisões conceituais,
+metodológicas e redacionais incorporadas à versão final são de responsabilidade
+do pesquisador.
+
+---
+
+<span class="hljs-section">## Interação 1</span>
+
+<span class="hljs-section">### Pergunta do pesquisador</span>
+
+<span class="hljs-quote">&gt; Inserir aqui a pergunta realizada.</span>
+
+<span class="hljs-section">### Resposta da ferramenta</span>
+
+Inserir aqui a resposta recebida.
+
+<span class="hljs-section">### Decisão adotada</span>
+
+Explicar o que foi aproveitado, reformulado ou rejeitado.
+
+---
+
+<span class="hljs-section">## Interação 2</span>
+
+<span class="hljs-section">### Pergunta do pesquisador</span>
+
+<span class="hljs-quote">&gt; Inserir aqui a pergunta realizada.</span>
+
+<span class="hljs-section">### Resposta da ferramenta</span>
+
+Inserir aqui a resposta recebida.
+
+<span class="hljs-section">### Decisão adotada</span>
+
+Explicar o efeito da interação sobre o projeto.</pre></div>
+
+
+<p>A seção <strong>“Decisão adotada”</strong> é especialmente importante. Ela transforma o arquivo de uma simples transcrição em um registro metodológico das escolhas feitas pelo pesquisador.</p>
+
+<h2><code>sintese_das_alteracoes.md</code></h2>
+
+<p>Esse arquivo deve apresentar apenas as modificações relevantes entre as versões.</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section"># Síntese da revisão da versão 02 para a versão 03</span>
+
+<span class="hljs-section">## Visão geral</span>
+
+A terceira versão ampliou o objeto da pesquisa. A investigação deixou de
+se concentrar exclusivamente nos fatores associados às mortes violentas
+de crianças e adolescentes e passou a examinar também as práticas da rede
+de proteção do Distrito Federal e o conteúdo atribuído ao princípio
+constitucional da prioridade absoluta.
+
+<span class="hljs-section">## Alterações principais</span>
+
+<span class="hljs-section">### 1. Reformulação da pergunta central</span>
+
+<span class="hljs-strong">**Versão 02:**</span>  
+Quais fatores estão associados às mortes violentas de crianças e adolescentes
+no Distrito Federal?
+
+<span class="hljs-strong">**Versão 03:**</span>  
+Como a rede de proteção a crianças e adolescentes do Distrito Federal organiza
+suas prioridades de proteção diante de mortes violentas, e de que forma essas
+prioridades se relacionam com o princípio constitucional da prioridade absoluta?
+
+<span class="hljs-section">### 2. Ampliação do objeto</span>
+
+Foram incorporados:
+
+<span class="hljs-bullet">-</span> o funcionamento da rede de proteção;
+<span class="hljs-bullet">-</span> as prioridades institucionais de proteção e prevenção;
+<span class="hljs-bullet">-</span> o princípio constitucional da prioridade absoluta;
+<span class="hljs-bullet">-</span> a jurisprudência do STF, STJ e TJDFT;
+<span class="hljs-bullet">-</span> a relação entre fatores de risco, políticas públicas e respostas judiciais.
+
+<span class="hljs-section">### 3. Alteração do eixo jurídico</span>
+
+A justiça restaurativa deixou de ocupar a posição central atribuída na versão
+anterior. A prioridade absoluta passou a funcionar como categoria jurídica e
+política de análise.
+
+<span class="hljs-section">### 4. Ampliação do corpus empírico</span>
+
+O corpus passou a incluir documentos institucionais da rede de proteção,
+políticas públicas, decisões judiciais e materiais relativos a um estudo de caso.
+
+<span class="hljs-section">### 5. Continuidade metodológica</span>
+
+Foi mantida a caracterização da pesquisa como empírica e multimétodo, com
+ampliação dos procedimentos de análise documental e jurisprudencial.</pre></div>
+
+
+<h2><code>quadro_comparativo_v02_v03.csv</code></h2>
+
+<p>Esse arquivo permite demonstrar as alterações de forma estruturada:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">csv</span></div><pre class="code-block hljs"><span class="hljs-built_in">elemento,</span>versao_02,versao_03,alteracao,justificativa
+<span class="hljs-built_in">tema,</span><span class="hljs-string">&quot;Mortes violentas de crianças e adolescentes no DF&quot;</span>,<span class="hljs-string">&quot;Mortes violentas e práticas de proteção e prevenção no DF&quot;</span>,<span class="hljs-string">&quot;Ampliação&quot;</span>,<span class="hljs-string">&quot;Incorporação da dimensão institucional&quot;</span>
+<span class="hljs-built_in">pergunta_central,</span><span class="hljs-string">&quot;Fatores associados às mortes violentas&quot;</span>,<span class="hljs-string">&quot;Prioridades da rede de proteção e prioridade absoluta&quot;</span>,<span class="hljs-string">&quot;Reformulação&quot;</span>,<span class="hljs-string">&quot;Articulação entre evidências empíricas e resposta jurídica&quot;</span>
+<span class="hljs-built_in">categoria_juridica,</span><span class="hljs-string">&quot;Justiça restaurativa&quot;</span>,<span class="hljs-string">&quot;Prioridade absoluta&quot;</span>,<span class="hljs-string">&quot;Substituição do eixo central&quot;</span>,<span class="hljs-string">&quot;Maior aderência ao problema de proteção institucional&quot;</span>
+<span class="hljs-built_in">jurisprudencia,</span><span class="hljs-string">&quot;Não ocupava eixo autônomo&quot;</span>,<span class="hljs-string">&quot;STF, STJ e TJDFT&quot;</span>,<span class="hljs-string">&quot;Inclusão&quot;</span>,<span class="hljs-string">&quot;Análise do sentido judicial da prioridade absoluta&quot;</span>
+<span class="hljs-built_in">rede_de_protecao,</span><span class="hljs-string">&quot;Presença limitada&quot;</span>,<span class="hljs-string">&quot;Objeto central de investigação&quot;</span>,<span class="hljs-string">&quot;Ampliação&quot;</span>,<span class="hljs-string">&quot;Comparação entre riscos e prioridades institucionais&quot;</span></pre></div>
+
+
+<h2><code>README.md</code> da pasta de revisão</h2>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section"># Revisão da versão 02 para a versão 03</span>
+
+Esta pasta documenta o processo de reformulação que resultou na terceira
+versão do projeto, atualmente adotada como projeto de referência da pesquisa.
+
+O processo incluiu diálogo exploratório com a ferramenta Perplexity, revisão
+das perguntas de pesquisa, redefinição do eixo jurídico, ampliação do corpus
+empírico e incorporação da rede de proteção e do princípio da prioridade
+absoluta.
+
+<span class="hljs-section">## Conteúdo</span>
+
+<span class="hljs-bullet">-</span> <span class="hljs-code">`historico_chat_perplexity.md`</span>: versão organizada e revisada do diálogo;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`sintese_das_alteracoes.md`</span>: descrição das principais modificações;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`quadro_comparativo_v02_v03.csv`</span>: comparação estruturada entre as versões;
+<span class="hljs-bullet">-</span> <span class="hljs-code">`arquivos_originais/`</span>: exportação original do histórico, preservada para
+  rastreabilidade.
+
+<span class="hljs-section">## Responsabilidade autoral</span>
+
+A ferramenta de inteligência artificial foi utilizada como apoio exploratório.
+A seleção, validação e incorporação das alterações foram realizadas pelo
+pesquisador, que permanece responsável pelas formulações do projeto.</pre></div>
+
+
+<h2>Acréscimo no README principal</h2>
+
+<p>Inclua uma seção após “Projeto atual”:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">markdown</span></div><pre class="code-block hljs"><span class="hljs-section">## Histórico de elaboração</span>
+
+O repositório preserva as versões anteriores do projeto e os registros dos
+processos de reformulação.
+
+A passagem da versão 02 para a versão 03, atualmente adotada como projeto de
+referência, está documentada em:
+
+<span class="hljs-code">`01_projeto/processo_de_revisao/v02_para_v03/`</span>
+
+A documentação reúne o histórico de interação com a ferramenta Perplexity,
+uma síntese das decisões adotadas e um quadro comparativo das alterações
+realizadas.</pre></div>
+
+
+<p>A melhor prática é publicar <strong>tanto a exportação original quanto uma versão organizada em Markdown</strong>. A primeira assegura rastreabilidade; a segunda facilita a leitura e explicita quais sugestões foram aceitas, modificadas ou rejeitadas.</p></div></div>
+  </div>
+  <div id="lb"><img id="lb-img"></div>
+  <script>
+    const lb = document.getElementById('lb');
+    const lbImg = document.getElementById('lb-img');
+    document.querySelectorAll('.content img').forEach(img => {
+      img.addEventListener('click', () => { lbImg.src = img.src; lb.classList.add('open'); });
+    });
+    lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+  </script>
+</body>
+</html>

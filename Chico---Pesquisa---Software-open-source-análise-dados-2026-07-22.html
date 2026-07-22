@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chico - Pesquisa - Software open source análise dados</title>
+  <style>
+    :root {
+      --bg: #FFF; --fg: #000; --user-bg: #f4f4f4;
+      --code-bg: #ececec; --table-bdr: rgba(0,0,0,0.15);
+      --bq-bdr: rgba(0,0,0,0.2); --cb-bg: #2a2a2a; --cb-bdr: #000;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif;
+      font-size: 16px; background: var(--bg); color: var(--fg);
+      padding: 20px; margin: 0 auto; line-height: 1.6;
+    }
+    .header {
+      text-align: center; margin: 0 auto 30px;
+      border-bottom: 2px dashed var(--fg); padding-bottom: 15px; max-width: 1200px;
+    }
+    .title { font-size: 24px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+    .timestamp { font-size: 14px; margin-top: 10px; opacity: 0.7; }
+    .conversation { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .message { margin-bottom: 20px; padding: 10px 20px; border-radius: 18px; width: fit-content; clear: both; overflow: hidden; }
+    .user-message { float: right; max-width: 80%; background: var(--user-bg); }
+    .assistant-message { float: left; max-width: 95%; }
+    .content { user-select: text; overflow-wrap: break-word; }
+    .content img { max-height: 220px; width: auto; border-radius: 8px; margin: 8px 0; display: block; cursor: zoom-in; transition: opacity 0.15s; }
+    .content img:hover { opacity: 0.85; }
+    #lb { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; }
+    #lb.open { display: flex; }
+    #lb img { max-width: 90vw; max-height: 90vh; border-radius: 10px; object-fit: contain; cursor: default; box-shadow: 0 8px 40px rgba(0,0,0,0.6); }
+    .content h1 { font-size: 24px; margin: .67em 0; }
+    .content h2 { font-size: 20px; margin: .75em 0; }
+    .content h3 { font-size: 18px; margin: .83em 0; }
+    .content h4 { font-size: 16px; margin: 1.12em 0; }
+    .content h5 { font-size: 14px; margin: 1.5em 0; }
+    .content h6 { font-size: 12px; margin: 1.67em 0; }
+    table { border-collapse: collapse; font-size: 14px; width: 100%; margin: 16px 0; }
+    th, td { padding: 8px 16px; text-align: left; vertical-align: top; font-size: 14px; }
+    th { font-weight: 600; border-bottom: 2px solid var(--table-bdr); }
+    td { border-bottom: 1px solid var(--table-bdr); }
+    tr:last-child td { border-bottom: none; }
+    hr { border: none; border-top: 1px solid var(--table-bdr); margin: 28px 0; clear: both; }
+    blockquote { border-left: 4px solid var(--bq-bdr); margin: 8px 0; padding: 8px 0 8px 24px; font-weight: 500; }
+    li { margin: 10px 0; }
+    code { background: var(--code-bg); color: var(--fg); padding: 2px 5px; border-radius: 4px; font-size: .9em; }
+    .code-wrapper { border-radius: 8px; overflow: hidden; margin: 12px 0; }
+    .code-header {
+      background: #1a1a1a; padding: 8px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .code-header::before {
+      content: "</>"; font-size: 11px; color: #10a37f; font-weight: 700;
+    }
+    .code-lang { font-size: 13px; font-weight: 500; color: #ccc; font-family: inherit; }
+    .code-block {
+      background: var(--cb-bg) !important; color: #fff !important;
+      padding: 16px !important; margin: 0 !important; border-radius: 0 !important;
+      border: none !important;
+      font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace !important;
+      font-size: 14px !important; line-height: 1.5 !important;
+      overflow-x: auto !important; white-space: pre !important;
+    }
+    .code-block code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: inherit; }
+    .hljs { background: transparent; color: #f8f8f2; }
+    .hljs-keyword,.hljs-selector-tag { color: #ff79c6; }
+    .hljs-string,.hljs-attr { color: #f1fa8c; }
+    .hljs-number,.hljs-literal { color: #bd93f9; }
+    .hljs-title,.hljs-function,.hljs-section { color: #50fa7b; }
+    .hljs-comment,.hljs-quote { color: #6272a4; font-style: italic; }
+    .hljs-params { color: #f8f8f2; }
+    .hljs-built_in,.hljs-type { color: #8be9fd; }
+    .hljs-variable,.hljs-template-variable { color: #ffb86c; }
+    .hljs-attribute,.hljs-tag { color: #ff79c6; }
+    .hljs-name { color: #50fa7b; }
+    .hljs-regexp,.hljs-link { color: #f1fa8c; }
+    .hljs-symbol,.hljs-bullet { color: #bd93f9; }
+    .hljs-meta { color: #6272a4; }
+    .hljs-deletion { color: #ff5555; }
+    .hljs-addition { color: #50fa7b; }
+    .hljs-emphasis { font-style: italic; }
+    .hljs-strong { font-weight: bold; }
+    .entity { text-decoration: underline; text-underline-offset: 3px; }
+    sup.cite { font-size: 10px; line-height: 1; }
+    a.cite-num { text-decoration: none; color: #10a37f; font-weight: 600; margin: 0 1px; }
+
+    del { text-decoration: line-through; opacity: 0.7; }
+    .math-block { margin: 16px 0; text-align: center; overflow-x: auto; }
+    .footnotes { font-size: 13px; padding-left: 20px; margin-top: 4px; }
+    .footnotes li { margin: 4px 0; opacity: 0.75; }
+    .fn-back { text-decoration: none; margin-left: 4px; }
+    sup a { text-decoration: none; color: #10a37f; }
+    li input[type="checkbox"] { margin-right: 5px; pointer-events: none; vertical-align: middle; }
+        @media print {
+      .message { float: none !important; max-width: 100% !important; }
+      .code-block { white-space: pre-wrap !important; }
+    }
+  </style>
+  
+</head>
+<body>
+  <div class="header">
+    <h1 class="title">Chico - Pesquisa - Software open source análise dados</h1>
+    <div class="timestamp">22/07/2026, 17:54:31</div>
+  </div>
+  <div class="conversation">
+    <div class="message user-message"><div class="content"><p>tem algum software open source que possa me ajudar no registro e análise de dados quantitativos?</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Vou separar as opções entre coleta/registro, análise estatística e visualização, priorizando ferramentas realmente abertas e adequadas à pesquisa acadêmica.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Sim. <strong>Para o seu perfil de pesquisa, minha principal indicação é o jamovi</strong>.</p>
+
+<h2>Melhor opção inicial: jamovi</h2>
+
+<p>O <strong>jamovi</strong> é um programa estatístico gratuito e de código aberto, com uma interface semelhante a uma planilha. Permite registrar variáveis, importar bases em CSV, Excel, SPSS, Stata e SAS, produzir tabelas, gráficos e executar análises estatísticas sem exigir programação. Ele funciona sobre a linguagem R e permite visualizar o código correspondente às análises, facilitando uma transição posterior para métodos mais avançados. O arquivo do projeto também pode reunir dados, configurações das análises e resultados, favorecendo a reprodutibilidade. <sup class="cite">[<a href="https://www.jamovi.org/getting-started.html?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Getting started">jamovi.org</a>]</sup></p>
+
+<p>Para sua pesquisa sobre mortes violentas de crianças e adolescentes, ele serviria para:</p>
+
+<ul><li>registrar cada ocorrência, processo ou decisão como uma linha;</li><li>definir variáveis numéricas, nominais e ordinais;</li><li>gerar frequências e tabelas cruzadas;</li><li>comparar território, faixa etária, raça/cor, sexo, tipo de violência e período;</li><li>aplicar testes de associação;</li><li>construir regressões;</li><li>gerar gráficos e tabelas para a tese.</li></ul>
+
+<h2>Combinação recomendada</h2>
+
+<table><thead><tr><th>Finalidade</th><th>Ferramenta</th><th>Utilização</th></tr></thead><tbody><tr><td>Estruturar e revisar a base</td><td><strong>LibreOffice Calc</strong></td><td>Dicionário de variáveis, conferência e codificação inicial</td></tr><tr><td>Analisar sem programar</td><td><strong>jamovi</strong></td><td>Estatísticas descritivas, cruzamentos, testes e regressões</td></tr><tr><td>Automatizar análises</td><td><strong>R + RStudio</strong></td><td>Scripts, limpeza complexa, análise espacial e reprodutibilidade</td></tr><tr><td>Registrar dados em equipe</td><td><strong>Baserow</strong></td><td>Banco relacional com formulários, tabelas vinculadas e colaboração</td></tr><tr><td>Coletar dados por formulários</td><td><strong>ODK</strong></td><td>Formulários digitais, inclusive offline</td></tr></tbody></table>
+
+<p>O LibreOffice Calc é uma planilha de código aberto adequada para organização, cálculo e visualização inicial dos dados. <sup class="cite">[<a href="https://www.libreoffice.org/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="LibreOffice">LibreOffice</a>]</sup></p>
+
+<p>O <strong>R</strong> é uma linguagem e ambiente aberto voltado à computação estatística e à produção de gráficos; o <strong>RStudio Desktop</strong> possui edição gratuita e aberta para trabalhar com scripts e projetos em R. <sup class="cite">[<a href="https://www.r-project.org/about.html?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="R: What is R?">R Project</a>]</sup></p>
+
+<p>O <strong>Baserow</strong> é interessante quando a pesquisa possui entidades relacionadas. Por exemplo: uma tabela de vítimas, outra de ocorrências, outra de territórios, outra de decisões judiciais e outra de instituições. Ele combina uma interface de planilha com recursos de banco relacional e pode ser instalado em infraestrutura própria. <sup class="cite">[<a href="https://baserow.io/user-docs/baserow-basics" target="_blank" rel="noopener" class="cite-num" title="Getting started with Baserow">Baserow</a>]</sup></p>
+
+<p>O <strong>ODK</strong> é mais apropriado quando os dados serão coletados mediante questionários ou formulários preenchidos por pesquisadores. Permite coleta pelo navegador ou por Android, inclusive sem conexão, e posterior exportação para CSV, R ou outras ferramentas. <sup class="cite">[<a href="https://docs.getodk.org/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="ODK Docs">ODK</a>]</sup></p>
+
+<h2>Outras alternativas</h2>
+
+<p><strong>JASP</strong> é muito semelhante ao jamovi e se destaca por oferecer, na mesma interface, análises frequentistas e bayesianas. Inclui estatísticas descritivas, tabelas de contingência, regressões, análise fatorial, confiabilidade, sobrevivência e séries temporais. <sup class="cite">[<a href="https://jasp-stats.org/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="JASP - A Fresh Way to Do Statistics">JASP</a>]</sup></p>
+
+<p><strong>GNU PSPP</strong> é uma alternativa livre para análise estatística de dados amostrais, particularmente útil para quem deseja uma ferramenta próxima da organização tradicional dos programas estatísticos. <sup class="cite">[<a href="https://www.gnu.org/software/pspp/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="PSPP - GNU Project - Free Software Foundation">GNU</a>]</sup></p>
+
+<h2>Recomendação para sua pesquisa</h2>
+
+<p>Eu adotaria este fluxo:</p>
+
+<p><strong>LibreOffice Calc → jamovi → R/RStudio</strong></p>
+
+<p>O Calc seria utilizado para elaborar o <strong>dicionário de dados</strong> e fazer a codificação inicial. O jamovi seria empregado na exploração, produção de tabelas e análise estatística. O R entraria progressivamente quando surgisse a necessidade de automatizar procedimentos, integrar diferentes bancos, produzir mapas ou manter scripts integralmente reproduzíveis.</p>
+
+<p>A estrutura mínima da base poderia começar assim:</p>
+
+<table><thead><tr><th>ID</th><th>Ano</th><th>Idade</th><th>Faixa etária</th><th>Sexo</th><th>Raça/cor</th><th>Região administrativa</th><th>Tipo de morte</th><th>Meio empregado</th><th>Contexto</th><th>Fonte</th></tr></thead><tbody></tbody></table>
+
+<p>Cada linha deve representar <strong>uma unidade de análise</strong>, e cada coluna, <strong>uma variável previamente definida</strong>. Dados identificáveis devem permanecer separados da base analítica, utilizando-se um código único para cada registro.</p>
+
+<p><strong>Escolha mais adequada agora: jamovi</strong>, acompanhado de um dicionário de variáveis no LibreOffice Calc.</p></div></div>
+    <div class="message user-message"><div class="content"><p>o python +sqlite3 resolveria tudo isso?</p></div></div>
+    <div class="message assistant-message"><div class="content"><p><strong>Python + SQLite3 pode resolver praticamente todo o ciclo de registro, tratamento e análise quantitativa da sua pesquisa</strong>, sobretudo se o trabalho for conduzido por você ou por uma equipe pequena. Contudo, não resolve tudo sozinho com a mesma facilidade de uma ferramenta pronta como jamovi, Baserow ou ODK.</p>
+
+<h2>O que essa combinação permite fazer</h2>
+
+<p>O <strong>SQLite</strong> funcionaria como banco de dados permanente. Nele você poderia armazenar, por exemplo:</p>
+
+<ul><li>ocorrências de mortes violentas;</li><li>vítimas;</li><li>processos judiciais;</li><li>decisões;</li><li>territórios;</li><li>instituições responsáveis;</li><li>categorias de análise;</li><li>fontes documentais;</li><li>histórico de alterações.</li></ul>
+
+<p>O <strong>Python</strong> faria a interface com o banco e permitiria:</p>
+
+<ul><li>importar planilhas e arquivos CSV;</li><li>limpar e padronizar dados;</li><li>identificar duplicidades;</li><li>validar campos;</li><li>realizar consultas;</li><li>calcular frequências, médias e proporções;</li><li>construir tabelas cruzadas;</li><li>executar testes estatísticos;</li><li>produzir gráficos;</li><li>exportar resultados para Excel, CSV, Word, HTML ou PDF;</li><li>automatizar rotinas repetitivas.</li></ul>
+
+<p>Um fluxo possível seria:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Fontes documentais
+        ↓
+Python: extração e limpeza
+        ↓
+SQLite: armazenamento estruturado
+        ↓
+Python/pandas: análise
+        ↓
+Gráficos, tabelas e relatórios</pre></div>
+
+
+<h2>Divisão de funções</h2>
+
+<table><thead><tr><th>Componente</th><th>Função</th></tr></thead><tbody><tr><td><code>sqlite3</code></td><td>Criação e gerenciamento do banco</td></tr><tr><td><code>pandas</code></td><td>Limpeza, transformação e análise tabular</td></tr><tr><td><code>numpy</code></td><td>Cálculos numéricos</td></tr><tr><td><code>scipy</code></td><td>Testes estatísticos</td></tr><tr><td><code>statsmodels</code></td><td>Regressões e modelos estatísticos</td></tr><tr><td><code>matplotlib</code></td><td>Gráficos</td></tr><tr><td><code>geopandas</code></td><td>Análise territorial e espacial</td></tr><tr><td><code>jupyter</code></td><td>Ambiente para documentar as análises</td></tr><tr><td><code>openpyxl</code></td><td>Importação e exportação de planilhas Excel</td></tr></tbody></table>
+
+<h2>Exemplo aplicado à sua pesquisa</h2>
+
+<p>Em vez de manter tudo em uma única planilha, você poderia estruturar tabelas relacionadas.</p>
+
+<h3>Tabela de vítimas</h3>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">sql</span></div><pre class="code-block hljs"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> vitimas (
+    id_vitima <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY</span> KEY,
+    sexo TEXT,
+    raca_cor TEXT,
+    idade <span class="hljs-type">INTEGER</span>,
+    faixa_etaria TEXT,
+    regiao_administrativa TEXT
+);</pre></div>
+
+
+<h3>Tabela de ocorrências</h3>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">sql</span></div><pre class="code-block hljs"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> ocorrencias (
+    id_ocorrencia <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY</span> KEY,
+    id_vitima <span class="hljs-type">INTEGER</span>,
+    data_ocorrencia TEXT,
+    tipo_morte TEXT,
+    meio_empregado TEXT,
+    contexto TEXT,
+    fonte TEXT,
+    <span class="hljs-keyword">FOREIGN</span> KEY (id_vitima) <span class="hljs-keyword">REFERENCES</span> vitimas(id_vitima)
+);</pre></div>
+
+
+<h3>Tabela de decisões judiciais</h3>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">sql</span></div><pre class="code-block hljs"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> decisoes (
+    id_decisao <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY</span> KEY,
+    tribunal TEXT,
+    numero_processo TEXT,
+    data_decisao TEXT,
+    tema TEXT,
+    menciona_prioridade_absoluta <span class="hljs-type">INTEGER</span>,
+    categoria_resultado TEXT
+);</pre></div>
+
+
+<p>Isso evita repetições e permite consultas como:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">sql</span></div><pre class="code-block hljs"><span class="hljs-keyword">SELECT</span>
+    v.raca_cor,
+    <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">AS</span> total
+<span class="hljs-keyword">FROM</span> ocorrencias o
+<span class="hljs-keyword">JOIN</span> vitimas v <span class="hljs-keyword">ON</span> v.id_vitima <span class="hljs-operator">=</span> o.id_vitima
+<span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> v.raca_cor
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> total <span class="hljs-keyword">DESC</span>;</pre></div>
+
+
+<h2>Onde Python + SQLite3 é superior</h2>
+
+<p>Essa solução é especialmente forte em:</p>
+
+<ul><li><strong>reprodutibilidade</strong>, porque todo procedimento pode ficar registrado em scripts;</li><li><strong>automação</strong>, evitando refazer manualmente limpezas e cálculos;</li><li><strong>controle metodológico</strong>, pois as regras de classificação ficam explícitas;</li><li><strong>integração de bases</strong>, como dados policiais, judiciais, demográficos e territoriais;</li><li><strong>jurimetria</strong>, com processamento de decisões e metadados;</li><li><strong>análise espacial</strong>, caso você relacione os registros às regiões administrativas do DF;</li><li><strong>auditabilidade</strong>, porque é possível conservar a base bruta e produzir uma base tratada separadamente.</li></ul>
+
+<h2>O que não será tão simples</h2>
+
+<h3>1. Digitação manual</h3>
+
+<p>O SQLite não possui, por padrão, uma interface amigável para preenchimento. Você precisaria:</p>
+
+<ul><li>inserir os dados por script;</li><li>importar uma planilha;</li><li>usar um programa como DB Browser for SQLite;</li><li>ou construir um formulário.</li></ul>
+
+<p>Para facilitar o registro, você poderia criar uma interface com:</p>
+
+<ul><li><strong>Streamlit</strong>;</li><li><strong>Flask</strong>;</li><li><strong>Django</strong>;</li><li><strong>PySide/PyQt</strong>.</li></ul>
+
+<p>Com Streamlit, por exemplo, seria possível criar um formulário no navegador para cadastrar cada ocorrência.</p>
+
+<h3>2. Análise estatística sem programação</h3>
+
+<p>No jamovi, você seleciona variáveis e testes por menus. Em Python, será necessário escrever e revisar código.</p>
+
+<p>Isso oferece mais controle, mas exige:</p>
+
+<ul><li>conhecimento estatístico;</li><li>documentação adequada;</li><li>cuidado com tipos de variáveis;</li><li>interpretação correta dos testes.</li></ul>
+
+<h3>3. Trabalho simultâneo em equipe</h3>
+
+<p>SQLite é excelente para uso local e individual, mas tem limitações quando várias pessoas precisam alterar o banco ao mesmo tempo.</p>
+
+<p>Para colaboração intensa, seria mais adequado usar:</p>
+
+<ul><li>PostgreSQL;</li><li>MariaDB;</li><li>Baserow conectado a um banco;</li><li>uma aplicação web centralizada.</li></ul>
+
+<h3>4. Formulários de coleta de campo</h3>
+
+<p>Python pode criar formulários, mas ferramentas como ODK já oferecem:</p>
+
+<ul><li>coleta offline;</li><li>validação de respostas;</li><li>sincronização;</li><li>gerenciamento de usuários;</li><li>formulários em dispositivos móveis.</li></ul>
+
+<p>Construir tudo isso do zero provavelmente não seria eficiente.</p>
+
+<h2>SQLite ou planilha?</h2>
+
+<p>Para uma base pequena e simples, uma planilha ainda pode ser suficiente. Mas o SQLite é superior quando existem:</p>
+
+<ul><li>diferentes tipos de entidades;</li><li>muitas variáveis;</li><li>relações entre tabelas;</li><li>necessidade de rastreabilidade;</li><li>grandes quantidades de registros;</li><li>rotinas de atualização;</li><li>risco de duplicação;</li><li>integração entre várias fontes.</li></ul>
+
+<p>Uma planilha única tende a gerar estruturas como esta:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">vítima + ocorrência + processo + decisão + território + instituição</pre></div>
+
+
+<p>Tudo repetido na mesma linha. No SQLite, essas informações podem ser separadas e relacionadas por identificadores.</p>
+
+<h2>Minha recomendação</h2>
+
+<p>Para a sua pesquisa, eu utilizaria:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">SQLite
+    banco principal da pesquisa
+
+Python + pandas
+    limpeza, padronização e cruzamento
+
+Jupyter Notebook
+    registro metodológico e análises
+
+Streamlit
+    formulário para inclusão e consulta dos registros
+
+LibreOffice ou Excel
+    apenas para importação, conferência e compartilhamento
+
+jamovi
+    opcional, para validar ou explorar análises estatísticas</pre></div>
+
+
+<p>Portanto, <strong>Python + SQLite3 resolve o núcleo do problema</strong>. Ele pode substituir planilhas, programas estatísticos básicos e parte das ferramentas de registro. O principal ponto é que você estará construindo um pequeno sistema de pesquisa, e não apenas usando um programa pronto. Para um projeto de doutorado com perspectiva de jurimetria, integração de fontes e análise territorial, essa arquitetura é bastante adequada.</p></div></div>
+    <div class="message user-message"><div class="content"><p>por exemplo, sobre estes dados que coletei, qual instrumento ou metodologia posso utilizar para triar quais são relevantes?</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Vou transformar sua pergunta em um instrumento de triagem aplicável à base: critérios, pontuação e classificação dos dados entre núcleo analítico, contexto, apoio e descarte.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Sim. Para esses dados, eu utilizaria uma <strong>matriz de elegibilidade e relevância dos indicadores</strong>, construída a partir da pergunta de pesquisa. A triagem não deve ser feita apenas verificando se o dado “fala de violência”, mas se ele realmente mede o objeto definido.</p>
+
+<p>No seu caso, a pergunta de triagem seria:</p>
+
+<blockquote><p><strong>Este indicador contribui para identificar as características, os fatores de risco e a distribuição das mortes violentas de crianças e adolescentes no Distrito Federal e permite relacioná-las às prioridades da rede de proteção?</strong></p></blockquote>
+
+<h2>1. Primeiro: defina os limites operacionais</h2>
+
+<p>Antes de pontuar os dados, quatro decisões precisam ficar metodologicamente explícitas.</p>
+
+<h3>População</h3>
+
+<p>No plano jurídico, criança e adolescente correspondem, em princípio, à população de <strong>0 a 17 anos</strong>. Entretanto, seus dados estão organizados nas faixas:</p>
+
+<ul><li>0 a 4 anos;</li><li>5 a 14 anos;</li><li>15 a 19 anos;</li><li>10 a 19 anos;</li><li>15 a 29 anos.</li></ul>
+
+<p>Isso produz uma incompatibilidade importante: a categoria de 15 a 19 anos inclui pessoas de 18 e 19 anos, que não são adolescentes para os fins do Estatuto da Criança e do Adolescente. Portanto, esses dados podem ser utilizados, mas devem ser registrados como <strong>aproximações</strong>, e não como medidas exatas da população adolescente.</p>
+
+<p>A categoria “jovens de 15 a 29 anos” é ainda menos adequada como indicador direto, pois mistura adolescentes e adultos. Os dados mostram, por exemplo, 89 homicídios de jovens de 15 a 29 anos em 2024, mas somente 13 homicídios na faixa de 15 a 19 anos. fileciteturn1file2</p>
+
+<h3>Território</h3>
+
+<p>O núcleo da pesquisa é o Distrito Federal. Assim:</p>
+
+<ul><li>dados do DF: potencialmente centrais;</li><li>dados do Brasil: comparativos ou contextuais;</li><li>dados por unidade da Federação: contextuais;</li><li>dados sem identificação territorial: baixa utilidade para a análise principal;</li><li>dados por região administrativa do DF: seriam os mais relevantes para a dimensão territorial.</li></ul>
+
+<h3>Evento estudado</h3>
+
+<p>Você precisa decidir quais eventos integram a categoria “mortes violentas”:</p>
+
+<ol><li>apenas homicídios;</li><li>homicídios e suicídios;</li><li>homicídios, suicídios e mortes decorrentes de intervenção estatal;</li><li>mortes violentas intencionais;</li><li>mortes violentas e evitáveis, incluindo sinistros de trânsito;</li><li>homicídios registrados mais homicídios ocultos estimados.</li></ol>
+
+<p>Essa definição modifica completamente a relevância dos indicadores. Suicídios e lesões autoprovocadas, por exemplo, aparecem na base para pessoas de 10 a 19 anos, mas somente são centrais se a definição da pesquisa incluir mortes autoprovocadas. fileciteturn1file0</p>
+
+<h3>Período</h3>
+
+<p>Os dados de 2014 a 2024 formam uma série comparável. Contudo, o período da análise precisa coincidir com o recorte temporal do projeto ou ser justificado como uma etapa exploratória.</p>
+
+<hr>
+
+<h1>2. Instrumento recomendado</h1>
+
+<p>Sugiro uma triagem em duas etapas:</p>
+
+<h2>Etapa A — critérios eliminatórios</h2>
+
+<p>O indicador somente passa para a pontuação quando possui:</p>
+
+<ol><li>fonte identificável;</li><li>definição minimamente clara;</li><li>ano ou período identificado;</li><li>unidade de medida conhecida;</li><li>território conhecido;</li><li>grupo populacional identificável.</li></ol>
+
+<p>Quando um desses elementos estiver ausente, o dado não precisa ser apagado, mas deve ser classificado como <strong>pendente de validação</strong>.</p>
+
+<h2>Etapa B — matriz de relevância</h2>
+
+<p>Pontue cada indicador segundo os critérios abaixo.</p>
+
+<table><thead><tr><th>Critério</th><th>0 pontos</th><th>1 ponto</th><th>2 pontos</th><th>3 pontos</th></tr></thead><tbody><tr><td>Adequação etária</td><td>Não trata de crianças ou adolescentes</td><td>Mistura majoritariamente adultos</td><td>Faixa aproximada, como 15–19</td><td>Faixa exata de 0–17 anos</td></tr><tr><td>Adequação territorial</td><td>Brasil ou território indefinido</td><td>Unidade da Federação comparada</td><td>Distrito Federal</td><td>Região administrativa/localidade do DF</td></tr><tr><td>Adequação ao desfecho</td><td>Evento não fatal</td><td>Violência genérica</td><td>Morte relacionada indiretamente</td><td>Morte violenta definida no projeto</td></tr><tr><td>Relação com a pergunta</td><td>Sem relação</td><td>Contextual</td><td>Explica perfil ou tendência</td><td>Testa diretamente pergunta ou hipótese</td></tr><tr><td>Desagregação</td><td>Nenhuma</td><td>Uma variável</td><td>Duas variáveis</td><td>Idade, raça, sexo, território e contexto</td></tr><tr><td>Comparabilidade temporal</td><td>Dado isolado</td><td>Poucos anos</td><td>Série com lacunas</td><td>Série padronizada e contínua</td></tr><tr><td>Qualidade metodológica</td><td>Definição desconhecida</td><td>Definição parcial</td><td>Fonte e método conhecidos</td><td>Fonte, método, numerador e denominador claros</td></tr><tr><td>Utilidade institucional</td><td>Não informa prevenção</td><td>Relação distante</td><td>Indica grupo ou fator de risco</td><td>Permite avaliar prioridades e respostas da rede</td></tr></tbody></table>
+
+<p>Pontuação máxima: <strong>24 pontos</strong>.</p>
+
+<h3>Classificação</h3>
+
+<table><thead><tr><th>Pontuação</th><th>Decisão</th></tr></thead><tbody><tr><td>19–24</td><td><strong>Núcleo analítico</strong></td></tr><tr><td>14–18</td><td><strong>Indicador complementar</strong></td></tr><tr><td>8–13</td><td><strong>Contextual</strong></td></tr><tr><td>0–7</td><td><strong>Excluir da análise principal</strong></td></tr><tr><td>Informação incompleta</td><td><strong>Pendente de validação</strong></td></tr></tbody></table>
+
+<p>Além da pontuação, alguns critérios devem funcionar como condições necessárias. Um indicador nacional não deve se tornar central apenas porque pontuou bem nos outros itens.</p>
+
+<hr>
+
+<h1>3. Aplicação aos dados que você coletou</h1>
+
+<h2>Núcleo analítico</h2>
+
+<h3>Homicídios de 0 a 4 anos no DF</h3>
+
+<p>Possui território, período, número absoluto, taxa e faixa etária infantil. É diretamente relacionado ao objeto. A pequena quantidade de casos exige cautela estatística, pois oscilações de um ou dois óbitos podem alterar bastante as taxas. fileciteturn1file0</p>
+
+<p><strong>Classificação:</strong> núcleo analítico.</p>
+
+<h3>Homicídios de 5 a 14 anos no DF</h3>
+
+<p>Também é diretamente pertinente e possui números e taxas anuais. A faixa agrega crianças e adolescentes de 12 a 14 anos, mas permanece integralmente dentro do universo de pessoas com menos de 18 anos. fileciteturn1file0</p>
+
+<p><strong>Classificação:</strong> núcleo analítico.</p>
+
+<h3>Homicídios de 15 a 19 anos no DF</h3>
+
+<p>É provavelmente o dado de maior magnitude, mas inclui jovens de 18 e 19 anos. Deve ser utilizado com uma nota metodológica explícita e, preferencialmente, substituído por microdados que permitam selecionar somente 15, 16 e 17 anos. A série mostra queda de 165 registros em 2014 para 13 em 2024. fileciteturn1file2</p>
+
+<p><strong>Classificação:</strong> núcleo analítico provisório.</p>
+
+<h3>Suicídios de 10 a 19 anos</h3>
+
+<p>São centrais apenas se o conceito de morte violenta incluir mortes autoprovocadas. Nesse caso, números de suicídios e taxas devem ser analisados separadamente dos homicídios, pois representam eventos, fatores de risco e políticas preventivas distintos. fileciteturn1file0</p>
+
+<p><strong>Classificação:</strong> núcleo ou exclusão conceitual, conforme a definição do desfecho.</p>
+
+<hr>
+
+<h2>Indicadores complementares</h2>
+
+<h3>Homicídios ocultos e mortes violentas por causa indeterminada</h3>
+
+<p>Esses dados são relevantes para discutir a qualidade dos registros e a possibilidade de subestimação dos homicídios. Entretanto, estão apresentados para toda a população do DF, sem recorte etário. fileciteturn1file4</p>
+
+<p><strong>Classificação:</strong> complementar metodológico.</p>
+
+<p>Eles não demonstram quantas crianças e adolescentes foram vítimas de homicídios ocultos, mas justificam a necessidade de examinar a qualidade da classificação das causas de morte.</p>
+
+<h3>Homicídios por arma de fogo no DF</h3>
+
+<p>São relevantes porque a arma de fogo pode constituir mecanismo central da violência letal. Contudo, os dados apresentados abrangem toda a população do DF, sem discriminação etária. fileciteturn1file1</p>
+
+<p><strong>Classificação:</strong> complementar.</p>
+
+<h3>Instrumentos utilizados por faixa etária no Brasil</h3>
+
+<p>A tabela nacional é analiticamente forte porque distingue padrões entre infantes, crianças e adolescentes. Ela indica que armas de fogo correspondem a 20,3% dos homicídios de 0 a 4 anos, 69,5% dos homicídios de 5 a 14 anos e 84,1% dos homicídios de 15 a 19 anos. Entretanto, o território é o Brasil, não o Distrito Federal. fileciteturn1file3</p>
+
+<p><strong>Classificação:</strong> complementar comparativo.</p>
+
+<p>Pode fundamentar hipóteses sobre a diferença entre violência doméstica contra crianças pequenas e violência armada urbana contra adolescentes, mas não comprova que o mesmo padrão ocorre no DF.</p>
+
+<h3>Internações por lesão autoprovocada</h3>
+
+<p>Medem morbidade, não mortalidade. Podem ajudar a interpretar os suicídios e as práticas de prevenção em saúde mental, mas não podem ser somadas aos óbitos. fileciteturn1file0</p>
+
+<p><strong>Classificação:</strong> complementar, caso suicídio integre o objeto.</p>
+
+<hr>
+
+<h2>Indicadores contextuais</h2>
+
+<h3>Homicídios gerais no DF</h3>
+
+<p>Os números e taxas gerais mostram o contexto de redução da violência letal no Distrito Federal. São úteis para comparar a tendência geral com a tendência entre crianças e adolescentes, mas não respondem diretamente à pergunta sobre essa população.</p>
+
+<p><strong>Classificação:</strong> contextual.</p>
+
+<p>Uma análise útil seria verificar se a redução entre adolescentes foi:</p>
+
+<ul><li>proporcional à redução geral;</li><li>maior que a redução geral;</li><li>menor que a redução geral.</li></ul>
+
+<h3>Homicídios de jovens de 15 a 29 anos</h3>
+
+<p>A faixa é excessivamente ampla para representar crianças e adolescentes. Pode mostrar o contexto da violência juvenil, mas não deve substituir os dados de adolescentes.</p>
+
+<p><strong>Classificação:</strong> contextual.</p>
+
+<h3>Homicídios de homens jovens</h3>
+
+<p>Também combinam adolescentes e adultos e não permitem identificar isoladamente meninos adolescentes.</p>
+
+<p><strong>Classificação:</strong> contextual.</p>
+
+<h3>Indicadores nacionais ou comparações entre unidades da Federação</h3>
+
+<p>A informação de que o DF apresentou uma das menores taxas estimadas de homicídio em 2024 ajuda a contextualizar o caso, mas não explica a distribuição interna nem as mortes de crianças e adolescentes.</p>
+
+<p><strong>Classificação:</strong> contextual introdutório.</p>
+
+<hr>
+
+<h2>Dados que devem ser excluídos da análise principal</h2>
+
+<h3>Homicídios de idosos</h3>
+
+<p>Não correspondem à população estudada. Só seriam pertinentes em um desenho comparativo entre faixas etárias, o que não parece ser o objeto central.</p>
+
+<p><strong>Classificação:</strong> excluir da base analítica principal.</p>
+
+<h3>Violência contra idosos</h3>
+
+<p>Mede outra população e, em parte, outro desfecho, como notificações e internações.</p>
+
+<p><strong>Classificação:</strong> excluir.</p>
+
+<h3>Homicídios de mulheres em geral</h3>
+
+<p>Sem recorte etário, não permite analisar meninas e adolescentes.</p>
+
+<p><strong>Classificação:</strong> contextual ou excluir.</p>
+
+<h3>Homicídios de mulheres negras e não negras</h3>
+
+<p>Podem demonstrar desigualdade racial e de gênero no DF, mas não comprovam essa desigualdade entre crianças e adolescentes.</p>
+
+<p><strong>Classificação:</strong> contextual, até que exista recorte etário.</p>
+
+<h3>Homicídios de indígenas em geral</h3>
+
+<p>Os números são muito pequenos e não possuem recorte de idade. As taxas também podem ser extremamente instáveis porque a população indígena utilizada como denominador é pequena.</p>
+
+<p><strong>Classificação:</strong> contextual ou indicador de lacuna.</p>
+
+<h3>Violência contra pessoas com deficiência</h3>
+
+<p>O dado apresentado se refere a notificações de violência, não a mortes violentas, e sua formatação não permite identificar claramente numeradores, denominadores e categorias.</p>
+
+<p><strong>Classificação:</strong> pendente de validação.</p>
+
+<h3>Sinistros de transporte terrestre</h3>
+
+<p>São mortes violentas ou externas, mas geralmente não intencionais. Somente devem entrar se a definição da pesquisa abranger mortes evitáveis e não apenas mortes intencionais.</p>
+
+<p><strong>Classificação:</strong> excluir ou criar um módulo separado.</p>
+
+<hr>
+
+<h1>4. Lacunas também são resultados</h1>
+
+<p>Alguns dados não devem ser tratados como “irrelevantes”, mas como <strong>lacunas de informação</strong>.</p>
+
+<p>É o caso da ausência de:</p>
+
+<ul><li>dados de crianças e adolescentes LGBTQIAPN+ no DF;</li><li>mortes de meninas negras por idade;</li><li>mortes de crianças e adolescentes indígenas;</li><li>mortes de crianças e adolescentes com deficiência;</li><li>dados por região administrativa;</li><li>dados combinando idade, raça, sexo e território;</li><li>dados sobre contexto da ocorrência;</li><li>dados sobre relação entre vítima e autor;</li><li>dados sobre atuação anterior da rede de proteção.</li></ul>
+
+<p>Nesse caso, a classificação correta é:</p>
+
+<blockquote><p><strong>Relevante para a pesquisa, mas indisponível na fonte consultada.</strong></p></blockquote>
+
+<p>Isso é diferente de “dado irrelevante”. A ausência pode demonstrar limitações institucionais de produção de informações e dificultar a própria definição de prioridades de proteção.</p>
+
+<hr>
+
+<h1>5. Problemas de consistência que precisam ser triados</h1>
+
+<p>Antes da análise estatística, sua base também precisa passar por uma <strong>auditoria de qualidade</strong>.</p>
+
+<p>Identifiquei, no material, alguns exemplos:</p>
+
+<h3>Rótulo aparentemente incorreto</h3>
+
+<p>O item denominado “Número de homicídios por arma de fogo por 100 mil habitantes” apresenta valores como 633, 490 e 517. Esses valores parecem ser números absolutos, e não taxas por 100 mil habitantes. A linha seguinte é que apresenta as taxas, como 22,9 e 17,5. fileciteturn1file1</p>
+
+<h3>Quantidade diferente de observações</h3>
+
+<p>A série da proporção de homicídios por arma de fogo apresenta dez valores, embora o período de 2014 a 2024 exija onze observações.</p>
+
+<h3>Categorias etárias incompatíveis</h3>
+
+<p>Há séries de 0–4, 5–14, 15–19, 10–19 e 15–29. Elas não podem ser diretamente agregadas sem risco de sobreposição.</p>
+
+<h3>Diferença entre indicador absoluto e taxa</h3>
+
+<p>Números absolutos são importantes para dimensionar a quantidade de casos. Taxas são necessárias para comparar grupos e anos com populações diferentes. Os dois indicadores devem ser preservados, mas nunca tratados como equivalentes.</p>
+
+<h3>Pequenos denominadores</h3>
+
+<p>Taxas de homicídio indígena ou de grupos populacionais pequenos podem variar intensamente com apenas um ou dois casos. Nesses casos, devem ser apresentados também:</p>
+
+<ul><li>número absoluto;</li><li>tamanho da população;</li><li>média móvel;</li><li>intervalo de confiança, quando possível.</li></ul>
+
+<hr>
+
+<h1>6. Estrutura da tabela de triagem</h1>
+
+<p>No SQLite, eu criaria uma tabela específica para o inventário dos indicadores:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">sql</span></div><pre class="code-block hljs"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> indicadores (
+    id_indicador <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY</span> KEY,
+    nome TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+    fonte TEXT,
+    territorio TEXT,
+    periodo_inicial <span class="hljs-type">INTEGER</span>,
+    periodo_final <span class="hljs-type">INTEGER</span>,
+    faixa_etaria TEXT,
+    evento TEXT,
+    unidade_medida TEXT,
+    numerador TEXT,
+    denominador TEXT,
+    recorte_racial <span class="hljs-type">INTEGER</span>,
+    recorte_sexo <span class="hljs-type">INTEGER</span>,
+    recorte_territorial <span class="hljs-type">INTEGER</span>,
+    adequacao_etaria <span class="hljs-type">INTEGER</span>,
+    adequacao_territorial <span class="hljs-type">INTEGER</span>,
+    adequacao_desfecho <span class="hljs-type">INTEGER</span>,
+    relacao_pergunta <span class="hljs-type">INTEGER</span>,
+    desagregacao <span class="hljs-type">INTEGER</span>,
+    comparabilidade_temporal <span class="hljs-type">INTEGER</span>,
+    qualidade_metodologica <span class="hljs-type">INTEGER</span>,
+    utilidade_institucional <span class="hljs-type">INTEGER</span>,
+    pontuacao_total <span class="hljs-type">INTEGER</span>,
+    classificacao TEXT,
+    decisao TEXT,
+    justificativa TEXT,
+    limitacoes TEXT
+);</pre></div>
+
+
+<p>As classificações poderiam ser padronizadas como:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">NUCLEO
+COMPLEMENTAR
+CONTEXTO
+LACUNA
+PENDENTE_VALIDACAO
+EXCLUIDO</pre></div>
+
+
+<h1>7. Síntese da triagem inicial</h1>
+
+<table><thead><tr><th>Grupo de dados</th><th>Classificação provável</th></tr></thead><tbody><tr><td>Homicídios de 0–4 anos no DF</td><td>Núcleo</td></tr><tr><td>Homicídios de 5–14 anos no DF</td><td>Núcleo</td></tr><tr><td>Homicídios de 15–19 anos no DF</td><td>Núcleo provisório</td></tr><tr><td>Suicídios de 10–19 anos</td><td>Núcleo condicionado ao conceito</td></tr><tr><td>Lesões autoprovocadas de 10–19 anos</td><td>Complementar</td></tr><tr><td>Homicídios ocultos no DF</td><td>Complementar metodológico</td></tr><tr><td>Armas de fogo no DF, todas as idades</td><td>Complementar</td></tr><tr><td>Instrumento por idade, Brasil</td><td>Complementar comparativo</td></tr><tr><td>Homicídios gerais no DF</td><td>Contextual</td></tr><tr><td>Jovens de 15–29 anos</td><td>Contextual</td></tr><tr><td>Mulheres, negros e indígenas sem idade</td><td>Contextual ou lacuna</td></tr><tr><td>Pessoas com deficiência — notificações</td><td>Pendente de validação</td></tr><tr><td>Idosos</td><td>Excluir</td></tr><tr><td>Sinistros de trânsito</td><td>Condicionado ao conceito</td></tr><tr><td>Ausência de dados LGBTQIAPN+ regionalizados</td><td>Lacuna relevante</td></tr></tbody></table>
+
+<p>A metodologia mais adequada, portanto, não é selecionar os indicadores pela magnitude ou pelo fato de produzirem gráficos interessantes. É aplicar um <strong>protocolo explícito de elegibilidade, qualidade e aderência às perguntas de pesquisa</strong>. Isso deixará justificável por que determinado dado entrou no capítulo analítico, foi usado apenas para contextualização ou foi excluído.</p></div></div>
+    <div class="message user-message"><div class="content"><p>o que preciso estudar para elaborar um protocolo como esse para minha pesquisa</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Vou organizar isso como uma trilha de formação aplicada ao seu projeto, distinguindo o que é essencial para construir o protocolo do que pode ficar para uma etapa posterior.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Para elaborar um protocolo defensável para sua pesquisa, você precisa estudar <strong>metodologia quantitativa aplicada a dados secundários</strong>, com ênfase em epidemiologia, qualidade da informação e operacionalização de conceitos. Não é necessário dominar regressões avançadas ou aprendizado de máquina antes de começar.</p>
+
+<p>Seus dados misturam números absolutos, taxas, estimativas, notificações, internações e óbitos; diferentes faixas etárias; indicadores do DF e do Brasil; além de homicídios, suicídios, lesões autoprovocadas e sinistros de trânsito. Portanto, o problema inicial é menos “estatístico” e mais de <strong>comparabilidade conceitual e metodológica</strong>. fileciteturn0file0</p>
+
+<h2>1. Desenho de pesquisa e operacionalização</h2>
+
+<p>Este é o primeiro conteúdo a estudar. Você precisa conseguir transformar conceitos jurídicos e teóricos em critérios observáveis.</p>
+
+<p>Estude:</p>
+
+<ul><li>pergunta e hipótese de pesquisa;</li><li>população de interesse;</li><li>unidade de análise;</li><li>variável, indicador e índice;</li><li>desfecho, exposição e variável de controle;</li><li>definição conceitual e definição operacional;</li><li>critérios de inclusão e exclusão;</li><li>indicadores primários, secundários e contextuais;</li><li>recortes temporal, territorial e populacional.</li></ul>
+
+<h3>Aplicação à sua pesquisa</h3>
+
+<p>Você precisará definir, por exemplo:</p>
+
+<table><thead><tr><th>Conceito</th><th>Decisão operacional necessária</th></tr></thead><tbody><tr><td>Criança e adolescente</td><td>0–17 anos ou faixas aproximadas disponíveis?</td></tr><tr><td>Morte violenta</td><td>Homicídio apenas ou também suicídio e trânsito?</td></tr><tr><td>Intencionalidade</td><td>Classificação jurídica, epidemiológica ou estatística?</td></tr><tr><td>Território</td><td>DF como um todo ou regiões administrativas?</td></tr><tr><td>Fator de risco</td><td>Associação estatística, condição social ou exposição institucional?</td></tr><tr><td>Rede de proteção</td><td>Quais órgãos, políticas e serviços serão considerados?</td></tr><tr><td>Prioridade</td><td>Prioridade normativa, orçamentária, institucional ou prática?</td></tr></tbody></table>
+
+<p>O primeiro produto dessa etapa deve ser uma <strong>matriz de operacionalização</strong>:</p>
+
+<table><thead><tr><th>Pergunta</th><th>Conceito</th><th>Definição operacional</th><th>Indicador</th><th>Fonte</th><th>Unidade de análise</th><th>Limitação</th></tr></thead><tbody></tbody></table>
+
+<p>Sem essa matriz, a triagem corre o risco de selecionar dados apenas porque parecem interessantes.</p>
+
+<hr>
+
+<h2>2. Epidemiologia e estatísticas de mortalidade</h2>
+
+<p>Como o objeto envolve óbitos e populações, você precisa dominar epidemiologia descritiva básica.</p>
+
+<p>Estude:</p>
+
+<ul><li>número absoluto;</li><li>razão, proporção e percentual;</li><li>taxa bruta e taxa específica;</li><li>numerador e denominador;</li><li>população exposta ao risco;</li><li>mortalidade por causa;</li><li>taxa específica por idade, sexo e raça;</li><li>padronização de taxas;</li><li>séries temporais;</li><li>variação percentual;</li><li>média móvel;</li><li>intervalo de confiança;</li><li>instabilidade de taxas com pequenos números;</li><li>mudança de composição populacional.</li></ul>
+
+<h3>Questões que você precisa aprender a responder</h3>
+
+<p>Uma queda de 165 para 13 homicídios entre pessoas de 15 a 19 anos é uma redução absoluta e percentual. Mas, para interpretar adequadamente, você também precisa saber:</p>
+
+<ul><li>a população dessa faixa diminuiu?</li><li>houve alteração na classificação dos óbitos?</li><li>a redução foi maior ou menor que na população geral?</li><li>o comportamento foi contínuo ou oscilante?</li><li>os dados de 2024 são preliminares ou consolidados?</li><li>quantos dos 13 registros eram de pessoas de 18 e 19 anos?</li><li>uma taxa baseada em dois óbitos deve ser comparada diretamente com outra baseada em centenas?</li></ul>
+
+<p>O Sistema de Informações sobre Mortalidade reúne dados quantitativos e qualitativos sobre os óbitos no país, tendo a Declaração de Óbito como documento fundamental. Por isso, conhecer o processo de produção desses registros é indispensável para interpretar os números, e não apenas calculá-los. <sup class="cite">[<a href="https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/svsa/vigilancia/declaracao-de-obito-manual-de-instrucoes-para-preenchimento.pdf?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="DECLARAÇÃO DE ÓBITO - Portal Gov.br">Serviços e Informações do Brasil</a>]</sup></p>
+
+<hr>
+
+<h2>3. Sistema de Informações sobre Mortalidade e causas externas</h2>
+
+<p>Você deve estudar especificamente como os dados brasileiros de mortalidade são produzidos.</p>
+
+<p>Conteúdos essenciais:</p>
+
+<ul><li>estrutura da Declaração de Óbito;</li><li>causa básica, causas antecedentes e causas associadas;</li><li>classificação pela CID-10;</li><li>causas externas;</li><li>agressões;</li><li>lesões autoprovocadas;</li><li>eventos de intenção indeterminada;</li><li>local de ocorrência e local de residência;</li><li>investigação de óbitos;</li><li>completude dos campos;</li><li>redistribuição e estimação de causas;</li><li>diferença entre registro policial e registro sanitário.</li></ul>
+
+<p>Isso será decisivo para compreender os chamados <strong>homicídios ocultos</strong>. Eles não são simplesmente homicídios que estavam “escondidos” no banco: são estimativas produzidas a partir de mortes violentas classificadas inicialmente como de intenção indeterminada, mediante metodologia específica. A edição de 2026 do Atlas da Violência mantém análises separadas para homicídios registrados e homicídios estimados. <sup class="cite">[<a href="https://repositorio.ipea.gov.br/entities/publication/9ab87dfc-33eb-4ac2-8a54-f4f1543dabbc?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Publication: Atlas da violência 2026">Repositório Ipea</a>]</sup></p>
+
+<h3>Leituras prioritárias</h3>
+
+<ol><li>Manual de preenchimento da Declaração de Óbito;</li><li>documentação do SIM;</li><li>capítulo metodológico do Atlas da Violência;</li><li>metodologia de estimação dos homicídios ocultos;</li><li>documentação sobre mortes violentas por causa indeterminada.</li></ol>
+
+<hr>
+
+<h2>4. Teoria da mensuração</h2>
+
+<p>A matriz anterior utiliza palavras como “adequação”, “relevância” e “qualidade”. Para que elas não se tornem avaliações subjetivas, você deve estudar <strong>mensuração</strong>.</p>
+
+<p>Conceitos centrais:</p>
+
+<ul><li>construto;</li><li>indicador observável;</li><li>validade de conteúdo;</li><li>validade de construto;</li><li>validade de critério;</li><li>confiabilidade;</li><li>precisão;</li><li>sensibilidade;</li><li>especificidade;</li><li>erro de mensuração;</li><li>viés de classificação;</li><li>falso positivo e falso negativo;</li><li>validade interna e externa.</li></ul>
+
+<h3>Aplicação</h3>
+
+<p>Considere o indicador:</p>
+
+<blockquote><p>Homicídios de pessoas de 15 a 19 anos.</p></blockquote>
+
+<p>Ele é confiável como medida da faixa registrada pela fonte, mas possui validade limitada para representar “adolescentes”, porque inclui pessoas de 18 e 19 anos.</p>
+
+<p>Portanto:</p>
+
+<ul><li>o dado não é necessariamente ruim;</li><li>sua correspondência com o conceito jurídico é imperfeita;</li><li>a limitação precisa ser registrada;</li><li>ele não deve receber a mesma classificação de um indicador de 15 a 17 anos.</li></ul>
+
+<p>Essa distinção entre <strong>qualidade do dado</strong> e <strong>adequação do dado à sua pergunta</strong> deve estruturar todo o protocolo.</p>
+
+<hr>
+
+<h2>5. Qualidade de dados</h2>
+
+<p>Este é o núcleo mais diretamente relacionado ao protocolo de triagem.</p>
+
+<p>Estude as seguintes dimensões:</p>
+
+<table><thead><tr><th>Dimensão</th><th>Pergunta</th></tr></thead><tbody><tr><td>Completude</td><td>Os registros ou campos esperados estão presentes?</td></tr><tr><td>Exatidão</td><td>O valor corresponde ao fenômeno registrado?</td></tr><tr><td>Consistência interna</td><td>Os valores da própria base são compatíveis entre si?</td></tr><tr><td>Consistência externa</td><td>O indicador é compatível com outras fontes?</td></tr><tr><td>Oportunidade</td><td>Qual é a defasagem entre o evento e a divulgação?</td></tr><tr><td>Comparabilidade</td><td>A definição permaneceu constante entre anos e fontes?</td></tr><tr><td>Unicidade</td><td>Há registros duplicados?</td></tr><tr><td>Granularidade</td><td>O dado possui o detalhamento necessário?</td></tr><tr><td>Rastreabilidade</td><td>É possível localizar fonte, tabela e método?</td></tr><tr><td>Estabilidade</td><td>O resultado é muito sensível a poucos registros?</td></tr></tbody></table>
+
+<p>A metodologia de revisão da qualidade de dados da OMS trabalha com avaliação sistemática dos dados e dos sistemas que os produzem, incluindo verificações de consistência, completude e qualidade do processo informacional. <sup class="cite">[<a href="https://cdn.who.int/media/docs/default-source/data-quality-pages/who-dqr-framework-v1-0-overview.pdf?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Data Quality Review (DQR) Toolkit">Organização Mundial da Saúde</a>]</sup></p>
+
+<h3>Produto dessa etapa</h3>
+
+<p>Crie uma ficha de avaliação por indicador:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Nome do indicador:
+Fonte:
+Tabela/página:
+Data de acesso:
+Numerador:
+Denominador:
+População:
+Território:
+Período:
+Unidade de medida:
+Definição original:
+Transformações realizadas:
+Campos ausentes:
+Problemas de comparabilidade:
+Adequação à pergunta:
+Decisão:
+Justificativa:</pre></div>
+
+
+<hr>
+
+<h2>6. Pesquisa com dados secundários e administrativos</h2>
+
+<p>Os dados do SIM, Sinan, registros policiais e sistemas judiciais não foram necessariamente produzidos para responder à sua pergunta de doutorado. Foram coletados para finalidades administrativas, sanitárias, policiais ou judiciais.</p>
+
+<p>Você precisa estudar:</p>
+
+<ul><li>processo gerador do dado;</li><li>finalidade original da coleta;</li><li>cobertura da base;</li><li>subnotificação;</li><li>seleção dos casos registrados;</li><li>mudanças administrativas;</li><li>diferenças entre ausência do fenômeno e ausência do registro;</li><li>linkage entre bases;</li><li>duplicidade;</li><li>dados faltantes;</li><li>codificação posterior;</li><li>revisão de registros;</li><li>versões preliminares e consolidadas.</li></ul>
+
+<p>O <strong>RECORD</strong> é especialmente importante porque foi desenvolvido como extensão do STROBE para pesquisas observacionais baseadas em dados de saúde coletados rotineiramente para finalidades não necessariamente científicas. <sup class="cite">[<a href="https://www.record-statement.org/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="RECORD Reporting Guidelines">record-statement.org</a>]</sup></p>
+
+<h3>Distinção importante</h3>
+
+<p>Um indicador pode apresentar:</p>
+
+<ul><li><strong>boa qualidade na fonte</strong>, mas baixa relevância para sua pergunta;</li><li><strong>alta relevância conceitual</strong>, mas baixa qualidade ou disponibilidade;</li><li><strong>boa relevância e qualidade</strong>, mas baixa comparabilidade temporal;</li><li><strong>ausência de dados</strong>, que se transforma em achado institucional.</li></ul>
+
+<hr>
+
+<h2>7. Classificação e harmonização de categorias</h2>
+
+<p>Suas fontes provavelmente utilizarão classificações diferentes. Você precisará aprender a construir uma <strong>tabela de correspondência</strong>, ou <em>crosswalk</em>.</p>
+
+<p>Estude:</p>
+
+<ul><li>taxonomias;</li><li>categorias mutuamente exclusivas;</li><li>categorias exaustivas;</li><li>compatibilização entre bases;</li><li>recodificação;</li><li>agregação e desagregação;</li><li>mudanças classificatórias;</li><li>níveis de mensuração;</li><li>classificação estatística versus classificação jurídica.</li></ul>
+
+<h3>Exemplo etário</h3>
+
+<table><thead><tr><th>Fonte</th><th>Categoria original</th><th>Correspondência com 0–17 anos</th></tr></thead><tbody><tr><td>Atlas</td><td>0–4</td><td>Integral</td></tr><tr><td>Atlas</td><td>5–14</td><td>Integral</td></tr><tr><td>Atlas</td><td>15–19</td><td>Parcial</td></tr><tr><td>Atlas</td><td>10–19</td><td>Parcial</td></tr><tr><td>Atlas</td><td>15–29</td><td>Fraca</td></tr><tr><td>Microdados</td><td>idade simples</td><td>Exata</td></tr></tbody></table>
+
+<p>Não se deve unir mecanicamente 0–4, 5–14 e 15–19 e apresentar o resultado como 0–17.</p>
+
+<p>Para dados criminais, a Classificação Internacional de Crimes para Fins Estatísticos da UNODC fornece conceitos e categorias voltados à padronização e comparabilidade entre sistemas e jurisdições. Ela é útil para distinguir a classificação jurídico-penal nacional da definição estatística do evento. <sup class="cite">[<a href="https://www.unodc.org/documents/data-and-analysis/statistics/crime/ICCS/ICCS_final-2015-March12_FINAL.pdf?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="UNODC
+United Nations Office on Drugs and CrimeINTE">Unodc</a>]</sup></p>
+
+<hr>
+
+<h2>8. Estudos observacionais</h2>
+
+<p>Pelo tipo de informação que você apresentou, a parte quantitativa da pesquisa provavelmente terá componentes de:</p>
+
+<ul><li>estudo descritivo;</li><li>estudo ecológico;</li><li>análise de séries temporais;</li><li>análise de dados secundários;</li><li>eventualmente estudo transversal ou painel territorial.</li></ul>
+
+<p>Você deve estudar:</p>
+
+<ul><li>estudo ecológico;</li><li>estudo transversal;</li><li>coorte;</li><li>unidade individual e unidade agregada;</li><li>falácia ecológica;</li><li>viés de seleção;</li><li>viés de informação;</li><li>confundimento;</li><li>modificação de efeito;</li><li>correlação e associação;</li><li>temporalidade;</li><li>inferência causal.</li></ul>
+
+<p>O STROBE fornece uma lista de itens para relatar estudos observacionais de coorte, caso-controle e transversais. Ele é um guia de transparência do relato, e não substitui um manual de desenho de pesquisa ou de análise estatística. <sup class="cite">[<a href="https://www.equator-network.org/reporting-guidelines/strobe/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="guidelines for reporting observational studies">EQUATOR Network</a>]</sup></p>
+
+<hr>
+
+<h2>9. Inferência causal, caso você use “fatores de risco”</h2>
+
+<p>Essa parte é indispensável se a tese pretender afirmar que determinada condição <strong>produz</strong>, <strong>aumenta</strong> ou <strong>explica</strong> mortes.</p>
+
+<p>Estude:</p>
+
+<ul><li>associação versus causalidade;</li><li>exposição e desfecho;</li><li>confundidores;</li><li>mediadores;</li><li>colisores;</li><li>causalidade reversa;</li><li>diagramas causais — DAGs;</li><li>viés ecológico;</li><li>controle estatístico;</li><li>temporalidade;</li><li>plausibilidade causal;</li><li>análise de sensibilidade.</li></ul>
+
+<p>Com dados agregados, geralmente é mais seguro escrever:</p>
+
+<blockquote><p>“fatores associados à distribuição das mortes”</p></blockquote>
+
+<p>do que:</p>
+
+<blockquote><p>“causas das mortes”.</p></blockquote>
+
+<p>Para afirmar causalidade, não basta mostrar que duas taxas aumentam ou diminuem simultaneamente.</p>
+
+<hr>
+
+<h2>10. Construção e validação de instrumentos</h2>
+
+<p>A matriz de pontuação que apresentei anteriormente deve ser entendida como um <strong>protótipo</strong>. Para transformá-la em instrumento metodologicamente robusto, estude:</p>
+
+<ul><li>construção de escalas;</li><li>elaboração de itens;</li><li>validade de conteúdo;</li><li>avaliação por especialistas;</li><li>teste-piloto;</li><li>concordância entre avaliadores;</li><li>confiabilidade interavaliador;</li><li>índice Kappa;</li><li>análise de sensibilidade dos pontos de corte;</li><li>técnica Delphi;</li><li>métodos multicritério de decisão.</li></ul>
+
+<h3>Alerta sobre a pontuação</h3>
+
+<p>Somar pontos de 0 a 3 pode criar uma falsa aparência de objetividade. Um indicador nacional, sem recorte etário, não deveria entrar no núcleo analítico apenas porque alcançou muitos pontos em outros critérios.</p>
+
+<p>O protocolo deve combinar:</p>
+
+<ol><li><strong>critérios obrigatórios</strong>;</li><li><strong>critérios de exclusão</strong>;</li><li><strong>avaliação qualitativa</strong>;</li><li>pontuação auxiliar;</li><li>justificativa escrita;</li><li>possibilidade de revisão.</li></ol>
+
+<p>Caso você realmente mantenha pesos, notas e uma pontuação global, deve estudar construção de indicadores compostos, incluindo normalização, ponderação, agregação e análise de sensibilidade. O manual da OCDE e do Joint Research Centre enfatiza que dimensões e variáveis devem decorrer de um quadro teórico e que escolhas de pesos e agregação precisam ser justificadas. <sup class="cite">[<a href="https://www.oecd.org/en/publications/handbook-on-constructing-composite-indicators-methodology-and-user-guide_9789264043466-en.html?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Handbook on Constructing Composite Indicators">OECD</a>]</sup></p>
+
+<hr>
+
+<h2>11. Gestão e reprodutibilidade dos dados</h2>
+
+<p>Aqui entram Python e SQLite.</p>
+
+<p>Estude:</p>
+
+<ul><li>dicionário de dados;</li><li>livro de códigos;</li><li>modelagem relacional;</li><li>chaves primárias e estrangeiras;</li><li>restrições de integridade;</li><li>normalização de banco;</li><li>versionamento;</li><li>trilha de auditoria;</li><li>dados brutos, tratados e analíticos;</li><li>scripts reproduzíveis;</li><li>testes de validação;</li><li>registro das decisões metodológicas;</li><li>controle de alterações.</li></ul>
+
+<p>Uma estrutura mínima seria:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">dados_brutos/
+    arquivos originais, sem alterações
+
+dados_intermediarios/
+    arquivos padronizados
+
+dados_analiticos/
+    bases utilizadas nos cálculos
+
+scripts/
+    importação, limpeza, validação e análise
+
+documentacao/
+    protocolo, dicionário e decisões
+
+resultados/
+    tabelas, gráficos e relatórios</pre></div>
+
+
+<p>No SQLite, cada transformação importante deve poder ser refeita por script. Evite corrigir diretamente valores no banco sem deixar registrado:</p>
+
+<ul><li>valor original;</li><li>valor corrigido;</li><li>motivo;</li><li>fonte da correção;</li><li>data;</li><li>responsável.</li></ul>
+
+<hr>
+
+<h2>12. Ética, proteção de dados e populações vulneráveis</h2>
+
+<p>Mesmo que parte dos dados seja pública, você deve estudar:</p>
+
+<ul><li>anonimização e pseudonimização;</li><li>minimização de dados;</li><li>risco de reidentificação;</li><li>pequenas células;</li><li>exposição territorial;</li><li>controle de acesso;</li><li>tratamento de dados de crianças e adolescentes;</li><li>divulgação responsável;</li><li>estigmatização de grupos e territórios;</li><li>ética em pesquisa com dados secundários;</li><li>LGPD;</li><li>exigências do sistema CEP/Conep, conforme o desenho definitivo.</li></ul>
+
+<p>Uma tabela que associe idade, raça, sexo, localidade e circunstâncias da morte pode permitir identificação indireta, especialmente quando há poucos casos.</p>
+
+<hr>
+
+<h1>Ordem recomendada de estudos</h1>
+
+<h2>Etapa 1 — indispensável para começar</h2>
+
+<ol><li>desenho de pesquisa;</li><li>operacionalização de conceitos;</li><li>indicadores epidemiológicos;</li><li>estrutura do SIM e da Declaração de Óbito;</li><li>qualidade de dados;</li><li>dicionário de dados.</li></ol>
+
+<p>Ao concluir essa etapa, você já poderá elaborar a primeira versão do protocolo.</p>
+
+<h2>Etapa 2 — indispensável para validar</h2>
+
+<ol><li>dados secundários e administrativos;</li><li>mensuração;</li><li>harmonização de categorias;</li><li>STROBE e RECORD;</li><li>teste-piloto;</li><li>concordância e revisão das decisões.</li></ol>
+
+<h2>Etapa 3 — necessária para a análise</h2>
+
+<ol><li>estatística descritiva;</li><li>séries temporais;</li><li>análise territorial;</li><li>intervalos de confiança;</li><li>pequenos números;</li><li>análise de sensibilidade.</li></ol>
+
+<h2>Etapa 4 — avançada</h2>
+
+<ol><li>regressão;</li><li>inferência causal;</li><li>modelos espaciais;</li><li>linkage probabilístico;</li><li>métodos multicritério;</li><li>aprendizado de máquina.</li></ol>
+
+<p><strong>Aprendizado de máquina não é prioridade neste momento.</strong> Antes dele, é mais importante definir corretamente quais óbitos, populações, territórios e períodos representam seu objeto.</p>
+
+<h1>Estrutura do protocolo que você deverá conseguir produzir</h1>
+
+<p>Depois dessa formação, seu documento pode ter esta estrutura:</p>
+
+<ol><li><strong>Finalidade do protocolo</strong>  </li><li><strong>Perguntas de pesquisa às quais os dados devem responder</strong>  </li><li><strong>Definições conceituais e operacionais</strong>  </li><li><strong>População, território e período</strong>  </li><li><strong>Fontes elegíveis</strong>  </li><li><strong>Unidades de análise</strong>  </li><li><strong>Critérios obrigatórios de inclusão</strong>  </li><li><strong>Critérios de exclusão</strong>  </li><li><strong>Dimensões de qualidade</strong>  </li><li><strong>Classificação dos indicadores</strong>  </li><li><strong>Tratamento de faixas etárias incompatíveis</strong>  </li><li><strong>Tratamento de dados faltantes e pequenas contagens</strong>  </li><li><strong>Regras para estimativas e dados observados</strong>  </li><li><strong>Procedimento de avaliação e revisão</strong>  </li><li><strong>Teste-piloto</strong>  </li><li><strong>Registro das decisões</strong>  </li><li><strong>Plano de análise estatística</strong>  </li><li><strong>Procedimentos éticos e de segurança</strong>  </li><li><strong>Controle de versão do protocolo</strong></li></ol>
+
+<h2>Prioridade imediata de leitura</h2>
+
+<p>Começaria nesta ordem:</p>
+
+<ol><li><strong>Manual de preenchimento da Declaração de Óbito</strong>;  </li><li><strong>documentação institucional do SIM</strong>;  </li><li><strong>capítulo metodológico do Atlas da Violência 2026</strong>;  </li><li><strong>módulos 1 e 2 do Data Quality Review da OMS</strong>;  </li><li><strong>STROBE</strong>;  </li><li><strong>RECORD</strong>;  </li><li><strong>ICCS da UNODC</strong>;  </li><li><strong>manual da OCDE/JRC</strong>, apenas se você mantiver uma pontuação ponderada.</li></ol>
+
+<p>O resultado esperado não é apenas uma tabela que diga quais dados são relevantes. É um documento que permita a outro pesquisador aplicar as mesmas regras aos mesmos dados e chegar a decisões semelhantes.</p></div></div>
+    <div class="message user-message"><div class="content"><p>como seria uma matriz de operacionalização. de exemplo para outro tema de pesquisa</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Uma <strong>matriz de operacionalização</strong> é o instrumento que transforma a pergunta teórica da pesquisa em elementos empiricamente observáveis. Ela conecta:</p>
+
+<p><strong>problema de pesquisa → conceitos → dimensões → indicadores → variáveis → fontes → técnicas de análise.</strong></p>
+
+<p>A seguir, uso um tema diferente do seu para demonstrar.</p>
+
+<h1>Exemplo: evasão escolar no ensino médio</h1>
+
+<h2>1. Tema</h2>
+
+<p><strong>Evasão escolar entre estudantes do ensino médio da rede pública.</strong></p>
+
+<h2>2. Problema de pesquisa</h2>
+
+<blockquote><p>Em que medida as condições socioeconômicas, familiares e escolares estão associadas à evasão de estudantes do ensino médio da rede pública do Município Alfa entre 2022 e 2025?</p></blockquote>
+
+<h2>3. Hipótese</h2>
+
+<blockquote><p>A evasão escolar é mais frequente entre estudantes submetidos à vulnerabilidade econômica, à necessidade de trabalhar, à distorção idade-série e a vínculos frágeis com a escola.</p></blockquote>
+
+<h2>4. Unidade de análise</h2>
+
+<p>Cada <strong>estudante matriculado no ensino médio da rede pública municipal ou estadual localizada no Município Alfa</strong>.</p>
+
+<p>A unidade de análise precisa ser definida porque determina o significado das linhas da base:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">1 linha = 1 estudante</pre></div>
+
+
+<p>Caso a pesquisa trabalhasse apenas com escolas, a unidade seria diferente:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">1 linha = 1 escola</pre></div>
+
+
+<p>Isso resultaria em uma pesquisa ecológica ou institucional, e não em uma análise individual dos estudantes.</p>
+
+<h1>Matriz de operacionalização</h1>
+
+<table><thead><tr><th>Pergunta específica</th><th>Conceito</th><th>Definição operacional</th><th>Dimensão</th><th>Indicador</th><th>Variável</th><th>Forma de mensuração</th><th>Fonte</th></tr></thead><tbody><tr><td>Qual é a magnitude da evasão escolar?</td><td>Evasão escolar</td><td>Estudante que deixou de frequentar a escola durante o ano letivo e não formalizou transferência</td><td>Situação escolar</td><td>Proporção de estudantes evadidos</td><td><code>situacao_escolar</code></td><td>0 = permaneceu; 1 = evadiu</td><td>Censo escolar e registros de matrícula</td></tr><tr><td>Em quais etapas a evasão é mais frequente?</td><td>Trajetória escolar</td><td>Percurso do estudante entre séries, matrículas, reprovações e abandono</td><td>Série escolar</td><td>Taxa de evasão por série</td><td><code>serie</code></td><td>1º, 2º ou 3º ano</td><td>Sistema de gestão escolar</td></tr><tr><td>A distorção idade-série está associada à evasão?</td><td>Distorção idade-série</td><td>Diferença de dois anos ou mais entre a idade do estudante e a idade esperada para a série</td><td>Trajetória escolar</td><td>Percentual de evadidos com distorção idade-série</td><td><code>distorcao_idade_serie</code></td><td>0 = não; 1 = sim</td><td>Registros escolares</td></tr><tr><td>A reprovação anterior está associada à evasão?</td><td>Fracasso escolar</td><td>Ocorrência de reprovação em um ou mais anos anteriores</td><td>Desempenho escolar</td><td>Número de reprovações anteriores</td><td><code>reprovacoes_anteriores</code></td><td>Contagem: 0, 1, 2, 3...</td><td>Histórico escolar</td></tr><tr><td>A baixa frequência antecede a evasão?</td><td>Vínculo escolar</td><td>Regularidade da presença do estudante nas atividades escolares</td><td>Participação escolar</td><td>Percentual de frequência mensal</td><td><code>frequencia_percentual</code></td><td>De 0% a 100%</td><td>Diário de classe</td></tr><tr><td>O desempenho acadêmico está associado à evasão?</td><td>Desempenho escolar</td><td>Resultado médio obtido pelo estudante nas disciplinas cursadas</td><td>Aprendizagem</td><td>Média das notas no período</td><td><code>media_notas</code></td><td>Escala de 0 a 10</td><td>Boletins escolares</td></tr><tr><td>Estudantes que trabalham evadem mais?</td><td>Inserção laboral precoce</td><td>Exercício de atividade remunerada durante o período letivo</td><td>Trabalho</td><td>Proporção de estudantes que trabalham</td><td><code>trabalha</code></td><td>0 = não; 1 = sim</td><td>Questionário</td></tr><tr><td>A carga de trabalho influencia a evasão?</td><td>Intensidade laboral</td><td>Quantidade de horas dedicadas semanalmente ao trabalho remunerado</td><td>Trabalho</td><td>Horas de trabalho por semana</td><td><code>horas_trabalho</code></td><td>Número de horas</td><td>Questionário</td></tr><tr><td>A renda familiar está associada à evasão?</td><td>Condição socioeconômica</td><td>Renda mensal total da família dividida pelo número de moradores</td><td>Renda</td><td>Renda familiar per capita</td><td><code>renda_per_capita</code></td><td>Valor em reais</td><td>Questionário ou CadÚnico</td></tr><tr><td>A insegurança alimentar está associada à evasão?</td><td>Vulnerabilidade social</td><td>Restrição de acesso regular e permanente a alimentos suficientes</td><td>Alimentação</td><td>Classificação de insegurança alimentar</td><td><code>inseguranca_alimentar</code></td><td>Ausente, leve, moderada ou grave</td><td>Questionário com escala validada</td></tr><tr><td>A distância até a escola interfere na permanência?</td><td>Acessibilidade escolar</td><td>Distância ou tempo necessário para o deslocamento entre residência e escola</td><td>Mobilidade</td><td>Tempo médio de deslocamento</td><td><code>tempo_deslocamento</code></td><td>Minutos</td><td>Questionário ou georreferenciamento</td></tr><tr><td>A percepção sobre a escola interfere na evasão?</td><td>Pertencimento escolar</td><td>Grau em que o estudante se sente acolhido, reconhecido e integrado à comunidade escolar</td><td>Vínculo subjetivo</td><td>Escore de pertencimento escolar</td><td><code>escore_pertencimento</code></td><td>Soma de itens em escala</td><td>Questionário</td></tr><tr><td>A violência escolar está relacionada à evasão?</td><td>Ambiente escolar</td><td>Exposição a agressões, ameaças, discriminação ou intimidação no espaço escolar</td><td>Segurança</td><td>Número de episódios relatados</td><td><code>episodios_violencia</code></td><td>Contagem</td><td>Questionário e registros escolares</td></tr><tr><td>A oferta de apoio reduz a evasão?</td><td>Proteção escolar</td><td>Existência e utilização de ações de acompanhamento pedagógico ou psicossocial</td><td>Resposta institucional</td><td>Participação em programa de apoio</td><td><code>recebeu_acompanhamento</code></td><td>0 = não; 1 = sim</td><td>Registros da escola</td></tr><tr><td>Existem diferenças territoriais?</td><td>Desigualdade territorial</td><td>Distribuição diferenciada da evasão entre bairros ou regiões administrativas</td><td>Território</td><td>Taxa de evasão por território</td><td><code>territorio_residencia</code></td><td>Código do bairro ou região</td><td>Endereço cadastral e base cartográfica</td></tr></tbody></table>
+
+<h1>Como interpretar as colunas</h1>
+
+<h2>Pergunta específica</h2>
+
+<p>É uma decomposição da pergunta principal.</p>
+
+<p>A pesquisa não deve começar procurando todos os dados disponíveis. Primeiro se define o que precisa ser respondido:</p>
+
+<ul><li>qual é a magnitude da evasão?</li><li>quais estudantes estão mais expostos?</li><li>quais condições antecedem a evasão?</li><li>quais respostas institucionais estão presentes?</li></ul>
+
+<p>Cada pergunta específica deve gerar uma ou mais linhas na matriz.</p>
+
+<h2>Conceito</h2>
+
+<p>É a categoria teórica ou analítica utilizada pela pesquisa, como:</p>
+
+<ul><li>evasão escolar;</li><li>vulnerabilidade socioeconômica;</li><li>pertencimento escolar;</li><li>trajetória escolar;</li><li>proteção institucional.</li></ul>
+
+<p>O conceito geralmente é mais abstrato do que aquilo que aparece diretamente na base.</p>
+
+<h2>Definição operacional</h2>
+
+<p>É a regra utilizada para reconhecer empiricamente o conceito.</p>
+
+<p>Por exemplo, “vulnerabilidade econômica” é uma categoria ampla. Ela pode ser operacionalizada como:</p>
+
+<ul><li>renda familiar per capita;</li><li>inscrição no CadÚnico;</li><li>recebimento de benefício social;</li><li>insegurança alimentar;</li><li>desemprego dos responsáveis.</li></ul>
+
+<p>A definição operacional deve dizer precisamente <strong>quando um caso será classificado naquela categoria</strong>.</p>
+
+<h2>Dimensão</h2>
+
+<p>Conceitos complexos normalmente possuem mais de uma dimensão.</p>
+
+<p>A vulnerabilidade social, por exemplo, pode envolver:</p>
+
+<ul><li>renda;</li><li>alimentação;</li><li>habitação;</li><li>trabalho;</li><li>acesso a serviços;</li><li>estrutura familiar.</li></ul>
+
+<p>A dimensão divide o conceito em partes analiticamente distinguíveis.</p>
+
+<h2>Indicador</h2>
+
+<p>É uma medida utilizada para representar uma dimensão do fenômeno.</p>
+
+<p>Exemplo:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Conceito: vínculo escolar
+Dimensão: participação
+Indicador: percentual de frequência mensal</pre></div>
+
+
+<p>Outro indicador do mesmo conceito poderia ser:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Conceito: vínculo escolar
+Dimensão: pertencimento
+Indicador: escore de pertencimento à escola</pre></div>
+
+
+<h2>Variável</h2>
+
+<p>É a forma concreta pela qual o indicador aparece na base de dados.</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">frequencia_percentual
+escore_pertencimento
+reprovacoes_anteriores
+renda_per_capita</pre></div>
+
+
+<p>O nome da variável deve ser acompanhado de definição, tipo, categorias e regras de preenchimento em um <strong>dicionário de dados</strong>.</p>
+
+<h2>Forma de mensuração</h2>
+
+<p>Informa como a variável será registrada:</p>
+
+<ul><li>binária;</li><li>nominal;</li><li>ordinal;</li><li>numérica discreta;</li><li>numérica contínua;</li><li>data;</li><li>texto padronizado.</li></ul>
+
+<p>Por exemplo:</p>
+
+<table><thead><tr><th>Variável</th><th>Tipo</th></tr></thead><tbody><tr><td><code>situacao_escolar</code></td><td>Binária</td></tr><tr><td><code>serie</code></td><td>Ordinal</td></tr><tr><td><code>territorio_residencia</code></td><td>Nominal</td></tr><tr><td><code>reprovacoes_anteriores</code></td><td>Numérica discreta</td></tr><tr><td><code>renda_per_capita</code></td><td>Numérica contínua</td></tr><tr><td><code>inseguranca_alimentar</code></td><td>Ordinal</td></tr></tbody></table>
+
+<h2>Fonte</h2>
+
+<p>Indica de onde virá o dado:</p>
+
+<ul><li>base administrativa;</li><li>questionário;</li><li>entrevista;</li><li>observação;</li><li>documento;</li><li>registro institucional;</li><li>base pública;</li><li>informação calculada pelo pesquisador.</li></ul>
+
+<p>A fonte deve ser suficientemente precisa. Em vez de indicar apenas “escola”, seria melhor registrar:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Sistema de gestão escolar, módulo Matrículas, extração realizada em 10/03/2026</pre></div>
+
+
+<h1>Matriz mais sintética</h1>
+
+<p>Em alguns projetos, uma versão resumida é suficiente:</p>
+
+<table><thead><tr><th>Objetivo específico</th><th>Conceito</th><th>Indicador</th><th>Variável</th><th>Fonte</th><th>Técnica de análise</th></tr></thead><tbody><tr><td>Medir a evasão</td><td>Evasão escolar</td><td>Proporção de estudantes evadidos</td><td>Situação escolar</td><td>Registro de matrícula</td><td>Frequências e taxas</td></tr><tr><td>Examinar o efeito da renda</td><td>Vulnerabilidade econômica</td><td>Renda familiar per capita</td><td>Renda per capita</td><td>CadÚnico/questionário</td><td>Comparação de médias e regressão</td></tr><tr><td>Verificar a relação com o trabalho</td><td>Inserção laboral</td><td>Estudante exerce trabalho remunerado</td><td>Trabalha</td><td>Questionário</td><td>Tabela cruzada e regressão</td></tr><tr><td>Analisar a trajetória escolar</td><td>Fracasso escolar</td><td>Número de reprovações</td><td>Reprovações anteriores</td><td>Histórico escolar</td><td>Frequências e regressão</td></tr><tr><td>Analisar diferenças territoriais</td><td>Desigualdade territorial</td><td>Taxa por bairro</td><td>Bairro de residência</td><td>Cadastro escolar</td><td>Mapas e taxas territoriais</td></tr><tr><td>Examinar a resposta institucional</td><td>Proteção escolar</td><td>Recebimento de acompanhamento</td><td>Acompanhamento</td><td>Registros institucionais</td><td>Comparação entre grupos</td></tr></tbody></table>
+
+<h1>Relação entre hipótese e variáveis</h1>
+
+<p>A matriz também ajuda a separar os papéis das variáveis.</p>
+
+<h2>Variável dependente</h2>
+
+<p>É o resultado que a pesquisa pretende explicar:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Evasão escolar:
+0 = não evadiu
+1 = evadiu</pre></div>
+
+
+<h2>Variáveis independentes</h2>
+
+<p>São as condições cuja associação com o resultado será examinada:</p>
+
+<ul><li>renda per capita;</li><li>trabalho remunerado;</li><li>horas de trabalho;</li><li>distorção idade-série;</li><li>reprovações anteriores;</li><li>frequência;</li><li>violência escolar;</li><li>tempo de deslocamento.</li></ul>
+
+<h2>Variáveis de controle</h2>
+
+<p>São incluídas porque podem estar relacionadas tanto às condições examinadas quanto à evasão:</p>
+
+<ul><li>idade;</li><li>sexo;</li><li>raça/cor;</li><li>série;</li><li>escola;</li><li>território;</li><li>turno;</li><li>composição familiar.</li></ul>
+
+<h2>Variáveis institucionais</h2>
+
+<p>Representam ações ou características das escolas:</p>
+
+<ul><li>acompanhamento psicossocial;</li><li>reforço escolar;</li><li>busca ativa;</li><li>alimentação escolar;</li><li>tamanho das turmas;</li><li>disponibilidade de transporte.</li></ul>
+
+<h1>Exemplo de operacionalização completa de um conceito</h1>
+
+<p>Considere o conceito de <strong>vínculo escolar</strong>.</p>
+
+<table><thead><tr><th>Elemento</th><th>Operacionalização</th></tr></thead><tbody><tr><td>Conceito</td><td>Vínculo escolar</td></tr><tr><td>Definição conceitual</td><td>Relação de integração, pertencimento e participação do estudante na vida escolar</td></tr><tr><td>Dimensão 1</td><td>Participação</td></tr><tr><td>Indicador 1</td><td>Percentual de frequência</td></tr><tr><td>Variável 1</td><td><code>frequencia_percentual</code></td></tr><tr><td>Dimensão 2</td><td>Pertencimento</td></tr><tr><td>Indicador 2</td><td>Escore de pertencimento escolar</td></tr><tr><td>Variável 2</td><td><code>escore_pertencimento</code></td></tr><tr><td>Dimensão 3</td><td>Relações interpessoais</td></tr><tr><td>Indicador 3</td><td>Percepção de apoio de professores e colegas</td></tr><tr><td>Variável 3</td><td><code>escore_apoio_escolar</code></td></tr><tr><td>Fonte</td><td>Registros escolares e questionário</td></tr><tr><td>Limitação</td><td>Frequência pode decorrer de doença, trabalho, transporte ou outras condições, não apenas de baixo vínculo</td></tr><tr><td>Técnica</td><td>Estatística descritiva, comparação entre grupos e regressão</td></tr></tbody></table>
+
+<p>Esse exemplo mostra que um conceito não precisa corresponder a uma única variável. Conceitos complexos normalmente exigem <strong>múltiplos indicadores</strong>.</p>
+
+<h1>Inclusão das limitações</h1>
+
+<p>Uma boa matriz deve registrar limitações desde o início.</p>
+
+<table><thead><tr><th>Indicador</th><th>Limitação</th></tr></thead><tbody><tr><td>Renda familiar informada</td><td>Possibilidade de subdeclaração ou desconhecimento</td></tr><tr><td>Frequência escolar</td><td>Não informa, sozinha, a razão das faltas</td></tr><tr><td>Registro de violência</td><td>Pode haver subnotificação</td></tr><tr><td>Participação em programa</td><td>Estudantes em maior risco podem ser os mais encaminhados</td></tr><tr><td>Taxa por escola</td><td>Escolas possuem perfis populacionais distintos</td></tr><tr><td>Situação “abandono”</td><td>Pode ser posteriormente corrigida para transferência</td></tr></tbody></table>
+
+<p>Isso evita que a análise atribua aos dados uma capacidade explicativa que eles não possuem.</p>
+
+<h1>Regras práticas para elaborar a matriz</h1>
+
+<p>Uma matriz consistente deve observar cinco regras:</p>
+
+<ol><li><strong>Cada indicador deve responder a uma pergunta da pesquisa.</strong>  </li></ol>
+<p>   Se não responde a nenhuma pergunta, provavelmente é apenas contextual ou dispensável.</p>
+
+<ol><li><strong>Cada conceito abstrato deve receber definição operacional.</strong>  </li></ol>
+<p>   Termos como vulnerabilidade, proteção, risco ou prioridade não podem permanecer indefinidos.</p>
+
+<ol><li><strong>O indicador deve ser compatível com a unidade de análise.</strong>  </li></ol>
+<p>   Não se deve atribuir diretamente a um estudante uma característica medida apenas no nível da escola ou do bairro.</p>
+
+<ol><li><strong>A fonte precisa efetivamente conter a variável.</strong>  </li></ol>
+<p>   Não basta que a informação seja teoricamente relevante; ela deve estar disponível ou ser coletável.</p>
+
+<ol><li><strong>As limitações devem ser registradas antes da análise.</strong>  </li></ol>
+<p>   Isso reduz decisões oportunistas feitas depois de conhecer os resultados.</p>
+
+<p>Em síntese, a matriz de operacionalização funciona como a <strong>arquitetura empírica da pesquisa</strong>. Ela demonstra como as categorias teóricas serão convertidas em evidências, quais dados serão admitidos e quais conclusões cada indicador permite — ou não permite — sustentar.</p></div></div>
+    <div class="message user-message"><div class="content"><p>em resumo, o que precisa ter um protocolo de triagem</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Em resumo, um <strong>protocolo de triagem de dados</strong> precisa conter:</p>
+
+<ol><li><strong>Finalidade da triagem</strong>  </li></ol>
+<p>   Explicar para que os dados serão selecionados e quais perguntas de pesquisa devem ajudar a responder.</p>
+
+<ol><li><strong>Definições operacionais</strong>  </li></ol>
+<p>   Definir precisamente os principais termos da pesquisa, como população, território, período, evento e unidade de análise.</p>
+
+<ol><li><strong>Critérios de inclusão</strong>  </li></ol>
+<p>   Estabelecer quais características um dado deve possuir para entrar na análise, por exemplo:</p>
+<ul><li>recorte etário compatível;</li><li>referência ao Distrito Federal;</li><li>período definido;</li><li>fonte identificável;</li><li>relação com o objeto da pesquisa.</li></ul>
+
+<ol><li><strong>Critérios de exclusão</strong>  </li></ol>
+<p>   Indicar quando um dado será retirado, como:</p>
+<ul><li>população fora do recorte;</li><li>indicador sem fonte;</li><li>duplicidade;</li><li>conceito incompatível;</li><li>ausência de numerador, denominador ou unidade de medida.</li></ul>
+
+<ol><li><strong>Critérios de qualidade</strong>  </li></ol>
+<p>   Avaliar:</p>
+<ul><li>completude;</li><li>consistência;</li><li>comparabilidade;</li><li>atualidade;</li><li>rastreabilidade;</li><li>precisão;</li><li>estabilidade das taxas.</li></ul>
+
+<ol><li><strong>Classificação dos dados</strong>  </li></ol>
+<p>   Separar os indicadores em categorias padronizadas, como:</p>
+<ul><li>núcleo analítico;</li><li>complementar;</li><li>contextual;</li><li>lacuna relevante;</li><li>pendente de validação;</li><li>excluído.</li></ul>
+
+<ol><li><strong>Regras para casos problemáticos</strong>  </li></ol>
+<p>   Prever como tratar:</p>
+<ul><li>faixas etárias incompatíveis;</li><li>dados faltantes;</li><li>pequenas contagens;</li><li>taxas sem denominador;</li><li>estimativas;</li><li>mudanças metodológicas;</li><li>divergências entre fontes.</li></ul>
+
+<ol><li><strong>Procedimento de decisão</strong>  </li></ol>
+<p>   Informar quem realiza a triagem, em qual ordem, com quais instrumentos e como serão resolvidas dúvidas ou divergências.</p>
+
+<ol><li><strong>Registro da justificativa</strong>  </li></ol>
+<p>   Cada inclusão, exclusão ou reclassificação deve ter uma justificativa escrita e verificável.</p>
+
+<ol><li><strong>Teste-piloto e revisão</strong>  </li></ol>
+<p>    Aplicar o protocolo inicialmente a uma amostra dos dados, identificar problemas e revisar os critérios antes da aplicação definitiva.</p>
+
+<p>Uma estrutura mínima de registro seria:</p>
+
+<table><thead><tr><th>Indicador</th><th>Fonte</th><th>População</th><th>Território</th><th>Período</th><th>Relação com a pergunta</th><th>Qualidade</th><th>Classificação</th><th>Decisão</th><th>Justificativa</th></tr></thead><tbody></tbody></table>
+
+<p>A lógica central é:</p>
+
+<blockquote><p><strong>definir o objeto → estabelecer critérios → avaliar a qualidade → classificar o dado → registrar e justificar a decisão.</strong></p></blockquote>
+
+<p>A pontuação pode auxiliar, mas não deve substituir critérios obrigatórios e uma justificativa metodológica.</p></div></div>
+  </div>
+  <div id="lb"><img id="lb-img"></div>
+  <script>
+    const lb = document.getElementById('lb');
+    const lbImg = document.getElementById('lb-img');
+    document.querySelectorAll('.content img').forEach(img => {
+      img.addEventListener('click', () => { lbImg.src = img.src; lb.classList.add('open'); });
+    });
+    lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+  </script>
+</body>
+</html>

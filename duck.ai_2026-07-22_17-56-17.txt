@@ -1,0 +1,26 @@
+﻿Esta conversa foi gerada com o Duck.ai (https://duck.ai) usando o modelo GPT-5.4 nano da OpenAI. Os chats com IA podem apresentar informações incorretas ou ofensivas (consulta https://duckduckgo.com/duckai/privacy-terms para obter mais informações).
+
+====================
+
+Pedido do utilizador 1 de 1 - 07/07/2026, 17:52:25:
+como posso nomear metodologias das ciẽncias sociasi de pesquisa empírica que não envolvem a troca interpessoal direta ?
+
+GPT-5.4 nano:
+Você pode nomear “metodologias empíricas sem troca interpessoal direta” usando termos que apontem para **fontes observacionais/documentais** e para **não-contacto** (sem entrevista, sem aplicação cara a cara). Algumas opções bem usadas:
+
+- **Pesquisa empírica não-interativa** (ou **sem interação interpessoal direta**)
+- **Pesquisa empírica de base documental**
+- **Pesquisa observacional** (quando é observação sem conversar com participantes)
+- **Análise de conteúdo / análise documental** (se usa textos, registros, mídias)
+- **Análise de dados secundários** (quando usa bases já existentes)
+- **Pesquisa baseada em registros administrativos** (quando vem de órgãos/contas/serviços)
+- **Estudo de dados de mídia e plataformas** (se analisa posts, comentários, etc.)
+- **Netnografia** (quando analisa comunidades online, em geral sem contato direto; use com critério)
+- **Pesquisa quantitativa por bases de dados** (se o foco é estatístico)
+- **Estudo de caso baseado em evidências secundárias** (se for um caso, mas sem contato)
+- **Métodos de pesquisa remota / à distância** (quando o “contato” é inexistente ou só mediado por dados, não por interação)
+
+Se quiser uma formulação “pronta” para projeto, fica assim:
+- **“Metodologia empírica baseada em dados secundários/documentais, sem interação interpessoal direta com participantes.”**
+
+Se você me disser **qual fonte de dados** (documentos? mídia social? registros administrativos? observação de campo sem entrevistas?), eu te sugiro 2–3 rótulos exatamente adequados e um parágrafo curto de justificativa para o método.

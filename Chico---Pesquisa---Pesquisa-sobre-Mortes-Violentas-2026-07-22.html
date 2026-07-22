@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chico - Pesquisa - Pesquisa sobre Mortes Violentas</title>
+  <style>
+    :root {
+      --bg: #FFF; --fg: #000; --user-bg: #f4f4f4;
+      --code-bg: #ececec; --table-bdr: rgba(0,0,0,0.15);
+      --bq-bdr: rgba(0,0,0,0.2); --cb-bg: #2a2a2a; --cb-bdr: #000;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif;
+      font-size: 16px; background: var(--bg); color: var(--fg);
+      padding: 20px; margin: 0 auto; line-height: 1.6;
+    }
+    .header {
+      text-align: center; margin: 0 auto 30px;
+      border-bottom: 2px dashed var(--fg); padding-bottom: 15px; max-width: 1200px;
+    }
+    .title { font-size: 24px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+    .timestamp { font-size: 14px; margin-top: 10px; opacity: 0.7; }
+    .conversation { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .message { margin-bottom: 20px; padding: 10px 20px; border-radius: 18px; width: fit-content; clear: both; overflow: hidden; }
+    .user-message { float: right; max-width: 80%; background: var(--user-bg); }
+    .assistant-message { float: left; max-width: 95%; }
+    .content { user-select: text; overflow-wrap: break-word; }
+    .content img { max-height: 220px; width: auto; border-radius: 8px; margin: 8px 0; display: block; cursor: zoom-in; transition: opacity 0.15s; }
+    .content img:hover { opacity: 0.85; }
+    #lb { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; }
+    #lb.open { display: flex; }
+    #lb img { max-width: 90vw; max-height: 90vh; border-radius: 10px; object-fit: contain; cursor: default; box-shadow: 0 8px 40px rgba(0,0,0,0.6); }
+    .content h1 { font-size: 24px; margin: .67em 0; }
+    .content h2 { font-size: 20px; margin: .75em 0; }
+    .content h3 { font-size: 18px; margin: .83em 0; }
+    .content h4 { font-size: 16px; margin: 1.12em 0; }
+    .content h5 { font-size: 14px; margin: 1.5em 0; }
+    .content h6 { font-size: 12px; margin: 1.67em 0; }
+    table { border-collapse: collapse; font-size: 14px; width: 100%; margin: 16px 0; }
+    th, td { padding: 8px 16px; text-align: left; vertical-align: top; font-size: 14px; }
+    th { font-weight: 600; border-bottom: 2px solid var(--table-bdr); }
+    td { border-bottom: 1px solid var(--table-bdr); }
+    tr:last-child td { border-bottom: none; }
+    hr { border: none; border-top: 1px solid var(--table-bdr); margin: 28px 0; clear: both; }
+    blockquote { border-left: 4px solid var(--bq-bdr); margin: 8px 0; padding: 8px 0 8px 24px; font-weight: 500; }
+    li { margin: 10px 0; }
+    code { background: var(--code-bg); color: var(--fg); padding: 2px 5px; border-radius: 4px; font-size: .9em; }
+    .code-wrapper { border-radius: 8px; overflow: hidden; margin: 12px 0; }
+    .code-header {
+      background: #1a1a1a; padding: 8px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .code-header::before {
+      content: "</>"; font-size: 11px; color: #10a37f; font-weight: 700;
+    }
+    .code-lang { font-size: 13px; font-weight: 500; color: #ccc; font-family: inherit; }
+    .code-block {
+      background: var(--cb-bg) !important; color: #fff !important;
+      padding: 16px !important; margin: 0 !important; border-radius: 0 !important;
+      border: none !important;
+      font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace !important;
+      font-size: 14px !important; line-height: 1.5 !important;
+      overflow-x: auto !important; white-space: pre !important;
+    }
+    .code-block code { background: transparent; color: inherit; padding: 0; border-radius: 0; font-size: inherit; }
+    .hljs { background: transparent; color: #f8f8f2; }
+    .hljs-keyword,.hljs-selector-tag { color: #ff79c6; }
+    .hljs-string,.hljs-attr { color: #f1fa8c; }
+    .hljs-number,.hljs-literal { color: #bd93f9; }
+    .hljs-title,.hljs-function,.hljs-section { color: #50fa7b; }
+    .hljs-comment,.hljs-quote { color: #6272a4; font-style: italic; }
+    .hljs-params { color: #f8f8f2; }
+    .hljs-built_in,.hljs-type { color: #8be9fd; }
+    .hljs-variable,.hljs-template-variable { color: #ffb86c; }
+    .hljs-attribute,.hljs-tag { color: #ff79c6; }
+    .hljs-name { color: #50fa7b; }
+    .hljs-regexp,.hljs-link { color: #f1fa8c; }
+    .hljs-symbol,.hljs-bullet { color: #bd93f9; }
+    .hljs-meta { color: #6272a4; }
+    .hljs-deletion { color: #ff5555; }
+    .hljs-addition { color: #50fa7b; }
+    .hljs-emphasis { font-style: italic; }
+    .hljs-strong { font-weight: bold; }
+    .entity { text-decoration: underline; text-underline-offset: 3px; }
+    sup.cite { font-size: 10px; line-height: 1; }
+    a.cite-num { text-decoration: none; color: #10a37f; font-weight: 600; margin: 0 1px; }
+
+    del { text-decoration: line-through; opacity: 0.7; }
+    .math-block { margin: 16px 0; text-align: center; overflow-x: auto; }
+    .footnotes { font-size: 13px; padding-left: 20px; margin-top: 4px; }
+    .footnotes li { margin: 4px 0; opacity: 0.75; }
+    .fn-back { text-decoration: none; margin-left: 4px; }
+    sup a { text-decoration: none; color: #10a37f; }
+    li input[type="checkbox"] { margin-right: 5px; pointer-events: none; vertical-align: middle; }
+        @media print {
+      .message { float: none !important; max-width: 100% !important; }
+      .code-block { white-space: pre-wrap !important; }
+    }
+  </style>
+  
+</head>
+<body>
+  <div class="header">
+    <h1 class="title">Chico - Pesquisa - Pesquisa sobre Mortes Violentas</h1>
+    <div class="timestamp">22/07/2026, 17:54:19</div>
+  </div>
+  <div class="conversation">
+    <div class="message user-message"><div class="content"><p>Tenho esse projeto de pesquisa.</p>
+
+<p>Tema: Mortes violentas de crianças e adolescentes e as práticas de proteção e prevenção no Distrito</p>
+<p>Federal</p>
+
+<p>Pergunta central: Como a rede de proteção a crianças e adolescentes do Distrito Federal organizam</p>
+<p>suas prioridades de proteção diante de mortes violentas intencionais, e em que medida essas</p>
+<p>prioridades se relacionam com o princípio constitucional da prioridade absoluta?</p>
+<p></p>
+<p>Perguntas secundárias: </p>
+<p>    • Quais fatores de risco estão associados às mortes violentas de crianças e adolescentes no Distrito Federal?</p>
+<p>    • Quais grupos, territórios e tipos de violência aparecem como prioritários nas práticas das redes de proteção do DF?</p>
+<p>    • O que o STF, o STJ e o TJDFT entendem por prioridade absoluta na infância e adolescência, e como essas definições se relacionam com as causas das mortes violentas de crianças e adolescentes no DF?</p>
+
+<p>Objetivo geral: Aprofundar a investigação iniciada na monografia (2024) identificando os fatores de risco associados às mortes violentas de crianças e adolescentes especificamente no Distrito Federal e analisando em que medida esses fatores se relacionam com as práticas da rede de proteção local.</p>
+
+<p>Objetivos específicos:</p>
+<p>    • Descrever as formas de morte violenta de crianças e adolescentes no DF.</p>
+<p>    • Situar as mortes violentas de crianças e adolescentes no DF em relação aos padrões nacionais e internacionais de vitimização desse grupo.</p>
+<p>    • Analisar como as políticas das redes de proteção relacionam-se com os fatores de risco às vidas de crianças e adolescentes no DF</p>
+<p>    • Examinar como o STF, STF e TJDFT tratam o princípio da prioridade absoluta na infância e adolescência.</p>
+<p>    • Interpretar o papel do princípio da prioridade absoluta na formulação e na avaliação das políticas de proteção a crianças e adolescentes no DF.</p>
+
+<p>Marco teórico</p>
+<p>    • Continuação da pesquisa realizada na monografia da graduação em Direito.</p>
+<p>    • Necropolítica (Achille Mbembe)</p>
+<p>    • Estudos que articulam capitalismo contemporâneo, Estado, direito e morte (Mbembe, Butler, Donna Haraway, Paul Preciado e autores nacionais).</p>
+<p>    • Teorias críticas do direito: Carolina Moraes, Pablo Holmes, Lynne Henderson, decisão do TST no caso do Miguel.</p>
+
+<p>Metodologia: pesquisa empírica multimétodo.</p>
+
+<p>Métodos de pesquisa</p>
+<p>    • Revisão de literatura sobre violência letal intencional, morte violenta intencional e mortes violentas de crianças e adolescentes.</p>
+<p>        ◦ Como crianças e adolescentes têm morrido de formas violentas;</p>
+<p>        ◦ Morte violenta intencional e violência letal como categorias de análise;</p>
+<p>    • Paradigma central: teorias de Achille Mbembe (necropolítica) e articulações com autores nacionais.</p>
+<p>    • Pesquisa exploratória:</p>
+<p>        ◦ Investigação exploratória sobre MVIs (mortes violentas intencionais) de crianças e adolescentes no Distrito Federal: quais fatores de risco estão associados às MVIs; quais grupos, territórios e tipos de violência sobressaem; como a situação atual no DF articula-se com contextos nacionais e globais de vitimação de crianças e adolescentes.</p>
+<p>        ◦ Pesquisa exploratória sobre políticas de promoção de segurança e proteção a crianças e adolescentes da rede de proteção do DF (CLDF; SUAS, SUS, Secretarias do GDF; movimentos sociais; decisões do TJDFT que versam sobre prioridade absoluta).</p>
+<p>    • Análise de conteúdo sobre o tratamento da prioridade absoluta no Judiciário: </p>
+<p>        ◦ Pesquisa do Instituto Alana em parceria com a FGV Direito SP (Supremo em Pauta) e Fiocruz sobre o tratamento do STF e do STJ em relação à prioridade absoluta, sistematizando 4.138 decisões do STF e 8.408 do STJ entre 1988 e 2019.</p>
+<p>        ◦ Decisões do TJDFT sobre prioridade absoluta.</p>
+<p>    • Estudo de caso de morte violenta intencional de criança ou adolescente no DF:</p>
+<p>        ◦ Reconstruir o caso concreto, incluindo contexto social, territorial, familiar e institucional;</p>
+<p>        ◦ Analisar como a rede de proteção respondeu ao caso;</p>
+<p>        ◦ Dialogar com o quadro teórico da necropolítica e com as prioridades discursivas das cortes e das políticas de proteção.</p>
+
+<p>Corpus empírico</p>
+<p>    • Dados estatísticos sobre mortes de crianças e adolescentes no DF, com triagem de mortes violentas, após definição conceitual de “morte violenta intencional”.</p>
+<p>    • Documentos institucionais de agentes da rede de proteção do DF.</p>
+<p>    • Relatório do Instituto Alana sobre decisões do STF e STJ sobre prioridade absoluta.</p>
+<p>    • Decisões judiciais do TJDFT.</p>
+<p>    • Materiais de doutrina e teorias críticas.</p>
+<p>    • Estudo de caso de morte violenta intencional de criança ou adolescente no DF: notícias, documentos, relatórios, publicações em redes sociais, eventuais decisões judiciais.</p>
+
+<p>Corpus conceitual</p>
+<p>    • Morte violenta intencional</p>
+<p>    • Necropolítica</p>
+<p>    • Rede de proteção</p>
+<p>    • Prioridade absoluta como chave interpretativa jurídica e política</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Vou tratar o texto como uma versão preliminar de projeto e devolver um diagnóstico: coerência interna, ajustes de pergunta/objetivos, recorte empírico, marco teórico e metodologia. Também vou apontar correções de redação que já aparecem no material.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Já há uma boa espinha dorsal. O ponto mais sensível é que o projeto combina quatro frentes grandes — dados de mortalidade, rede de proteção, jurisprudência e estudo de caso — então a principal melhoria é transformar isso em um desenho empírico controlável.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Seu projeto tem <strong>um tema forte, socialmente relevante e juridicamente promissor</strong>, mas ainda precisa de três ajustes para ganhar densidade acadêmica: <strong>recorte</strong>, <strong>operacionalização metodológica</strong> e <strong>amarração entre morte violenta, rede de proteção e prioridade absoluta</strong>.</p>
+
+<h2>1. Diagnóstico geral</h2>
+
+<p>A ideia central é boa: investigar se a rede de proteção do DF está orientando suas prioridades reais para os fatores que efetivamente expõem crianças e adolescentes à morte violenta. O melhor caminho é transformar a pesquisa em uma comparação entre:</p>
+
+<p><strong>a realidade empírica das mortes</strong>  </p>
+<p>versus  </p>
+<p><strong>as prioridades institucionais declaradas ou praticadas</strong>  </p>
+<p>versus  </p>
+<p><strong>o conteúdo jurídico da prioridade absoluta</strong>.</p>
+
+<p>A prioridade absoluta tem base constitucional no art. 227 da Constituição e no art. 4º do ECA, e envolve não apenas preferência retórica, mas dever de proteção reforçada, inclusive quanto ao direito à vida e à proteção contra violência, negligência, crueldade e opressão. <sup class="cite">[<a href="https://www.planalto.gov.br/ccivil_03/leis/l8069.htm?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="L8069 - Planalto">Planalto</a>]</sup></p>
+
+<h2>2. Principal problema do projeto atual</h2>
+
+<p>O projeto está ambicioso demais. Ele quer fazer, ao mesmo tempo:</p>
+
+<ol><li>análise estatística das mortes violentas;</li><li>comparação nacional e internacional;</li><li>análise das políticas da rede de proteção;</li><li>análise jurisprudencial de STF, STJ e TJDFT;</li><li>estudo de caso;</li><li>diálogo teórico com necropolítica, capitalismo, Estado, direito e morte.</li></ol>
+
+<p>Tudo isso é possível em uma tese longa, mas, para um projeto de pesquisa mais controlável, é melhor organizar em <strong>três eixos empíricos principais</strong> e deixar o estudo de caso como aprofundamento ilustrativo.</p>
+
+<p>Minha sugestão de eixo central:</p>
+
+<blockquote><p><strong>A pesquisa deve investigar se há correspondência ou descompasso entre os fatores de risco associados às mortes violentas de crianças e adolescentes no DF e as prioridades assumidas pela rede local de proteção, à luz do princípio da prioridade absoluta.</strong></p></blockquote>
+
+<p>Isso deixa o projeto mais preciso.</p>
+
+<h2>3. Tema refinado</h2>
+
+<p>Sugestão:</p>
+
+<p><strong>Mortes violentas intencionais de crianças e adolescentes no Distrito Federal: fatores de risco, rede de proteção e prioridade absoluta</strong></p>
+
+<p>Ou, em versão mais crítica:</p>
+
+<p><strong>Prioridade absoluta e gestão desigual da vida: mortes violentas intencionais de crianças e adolescentes no Distrito Federal</strong></p>
+
+<p>A primeira versão é mais objetiva e adequada para projeto acadêmico. A segunda é mais teórica e dialoga melhor com necropolítica.</p>
+
+<h2>4. Pergunta central revisada</h2>
+
+<p>A pergunta atual está boa, mas tem problema gramatical e analítico: “a rede de proteção [...] organizam” deveria ser “organiza” ou “as redes [...] organizam”. Além disso, “diante de mortes violentas intencionais” pode parecer que a rede só age depois da morte. Melhor formular como prevenção e prioridade institucional.</p>
+
+<p>Sugestão:</p>
+
+<blockquote><p><strong>Em que medida as prioridades institucionais da rede de proteção a crianças e adolescentes do Distrito Federal correspondem aos fatores de risco associados às mortes violentas intencionais desse grupo, e como essa correspondência — ou seu descompasso — se relaciona com o princípio constitucional da prioridade absoluta?</strong></p></blockquote>
+
+<p>Essa formulação é mais forte porque permite avaliar <strong>aderência</strong>, <strong>omissão</strong>, <strong>seletividade institucional</strong> e <strong>descompasso entre risco real e prioridade pública</strong>.</p>
+
+<h2>5. Perguntas secundárias revisadas</h2>
+
+<p>Eu reformularia assim:</p>
+
+<ol><li><strong>Quais são os principais perfis, territórios, circunstâncias e formas de morte violenta intencional de crianças e adolescentes no Distrito Federal?</strong></li></ol>
+
+<ol><li><strong>Quais fatores de risco aparecem associados a essas mortes, considerando variáveis como idade, gênero, raça/cor, território, vínculo com violência doméstica, violência armada, violência sexual, letalidade policial, evasão escolar e vulnerabilidades socioassistenciais?</strong></li></ol>
+
+<ol><li><strong>Quais grupos, territórios e tipos de violência são priorizados nos documentos, programas e práticas da rede de proteção do DF?</strong></li></ol>
+
+<ol><li><strong>Como STF, STJ e TJDFT interpretam o princípio da prioridade absoluta em casos envolvendo infância, adolescência, vida, segurança, omissão estatal e políticas públicas?</strong></li></ol>
+
+<ol><li><strong>Há convergência ou descompasso entre os riscos que levam à morte violenta e as prioridades jurídicas e institucionais da proteção infantojuvenil no DF?</strong></li></ol>
+
+<h2>6. Objetivo geral revisado</h2>
+
+<p>A versão atual está boa, mas pode ficar mais direta.</p>
+
+<p>Sugestão:</p>
+
+<blockquote><p><strong>Analisar os fatores de risco associados às mortes violentas intencionais de crianças e adolescentes no Distrito Federal e verificar em que medida as prioridades institucionais da rede local de proteção correspondem a esses fatores, à luz do princípio constitucional da prioridade absoluta.</strong></p></blockquote>
+
+<p>Essa formulação conecta os três pilares: <strong>morte violenta</strong>, <strong>rede de proteção</strong> e <strong>prioridade absoluta</strong>.</p>
+
+<h2>7. Objetivos específicos revisados</h2>
+
+<p>Eu corrigiria e reorganizaria assim:</p>
+
+<ol><li><strong>Delimitar conceitualmente a categoria “morte violenta intencional” aplicada a crianças e adolescentes.</strong></li></ol>
+
+<ol><li><strong>Descrever o perfil das mortes violentas intencionais de crianças e adolescentes no Distrito Federal, considerando idade, gênero, raça/cor, território, causa da morte e circunstâncias disponíveis.</strong></li></ol>
+
+<ol><li><strong>Situar o caso do Distrito Federal em relação a padrões nacionais e, quando pertinente, internacionais de vitimização letal infantojuvenil.</strong></li></ol>
+
+<ol><li><strong>Mapear políticas, programas, documentos e práticas institucionais da rede de proteção do DF voltados à prevenção de violências contra crianças e adolescentes.</strong></li></ol>
+
+<ol><li><strong>Analisar se as prioridades institucionais da rede de proteção correspondem aos fatores de risco identificados nos dados de mortalidade.</strong></li></ol>
+
+<ol><li><strong>Examinar como STF, STJ e TJDFT interpretam o princípio da prioridade absoluta em matéria de infância, adolescência, vida, segurança e políticas públicas.</strong></li></ol>
+
+<ol><li><strong>Interpretar os achados empíricos e jurídicos à luz da necropolítica e das teorias críticas do direito.</strong></li></ol>
+
+<p>Correção importante: no seu texto aparece “STF, STF e TJDFT”. O correto é <strong>STF, STJ e TJDFT</strong>.</p>
+
+<h2>8. Ajustes no marco teórico</h2>
+
+<p>O marco teórico está interessante, mas precisa evitar dispersão. Mbembe pode ser o eixo principal, mas Butler, Haraway e Preciado precisam ter funções muito bem delimitadas. Do contrário, a banca pode ver excesso de autores sem necessidade metodológica.</p>
+
+<p>Eu organizaria assim:</p>
+
+<table><thead><tr><th>Eixo</th><th>Função no projeto</th><th>Autores possíveis</th></tr></thead><tbody><tr><td>Necropolítica e gestão da morte</td><td>Explicar como o Estado distribui proteção, exposição ao risco e abandono</td><td>Achille Mbembe</td></tr><tr><td>Vidas protegidas e vidas descartáveis</td><td>Pensar reconhecimento, luto público, vulnerabilidade e desigualdade da proteção</td><td>Judith Butler</td></tr><tr><td>Direito, Estado e seletividade institucional</td><td>Analisar como normas universais convivem com práticas desiguais</td><td>teorias críticas do direito, Carolina Moraes, Pablo Holmes, Lynne Henderson</td></tr><tr><td>Infância, prioridade absoluta e proteção integral</td><td>Fundamentar juridicamente o dever reforçado de proteção</td><td>Constituição, ECA, doutrina da proteção integral, jurisprudência</td></tr><tr><td>Território e risco</td><td>Relacionar morte violenta, desigualdade urbana e seletividade territorial</td><td>autores nacionais sobre violência, racismo estrutural, segurança pública e território</td></tr></tbody></table>
+
+<p>Eu teria cautela com Donna Haraway e Paul Preciado. Eles podem entrar, mas apenas se houver uma justificativa clara. Para este projeto, talvez sejam menos centrais do que autores sobre <strong>violência letal juvenil, racismo, território, segurança pública, infância e proteção integral</strong>.</p>
+
+<h2>9. Metodologia: desenho mais consistente</h2>
+
+<p>A metodologia multimétodo é adequada, mas precisa ser dividida com clareza. Sugiro quatro módulos.</p>
+
+<h3>Módulo 1 — Análise quantitativa/descritiva das mortes</h3>
+
+<p>Fontes possíveis:</p>
+
+<ul><li>SIM/DATASUS, especialmente para óbitos por causas externas;</li><li>dados da SSP-DF;</li><li>Anuário Brasileiro de Segurança Pública;</li><li>Atlas da Violência/IPEA, se houver recorte útil;</li><li>bases de saúde, assistência social ou segurança disponíveis por pedido LAI.</li></ul>
+
+<p>O SIM é fonte importante porque registra mortalidade e permite construir indicadores a partir da causa mortis. <sup class="cite">[<a href="https://www.gov.br/saude/pt-br/composicao/svsa/sistemas-de-informacao/sim?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Sistema de Informações sobre Mortalidade - Portal Gov.br">Serviços e Informações do Brasil</a>]</sup> O Anuário Brasileiro de Segurança Pública também é relevante porque trabalha com a categoria de Mortes Violentas Intencionais e disponibiliza dados recentes, inclusive a 19ª edição com dados de 2024. <sup class="cite">[<a href="https://forumseguranca.org.br/publicacoes/anuario-brasileiro-de-seguranca-publica/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Anuário Brasileiro de Segurança Pública">Fórum Brasileiro de Segurança Pública</a>]</sup></p>
+
+<h3>Módulo 2 — Análise documental da rede de proteção do DF</h3>
+
+<p>Aqui entram:</p>
+
+<ul><li>planos distritais;</li><li>documentos da SEJUS, SEDES, SES, SSP, SEE e conselhos;</li><li>protocolos de atendimento;</li><li>relatórios de programas;</li><li>documentos da CLDF;</li><li>documentos do Conselho dos Direitos da Criança e do Adolescente;</li><li>relatórios de movimentos sociais e organizações da sociedade civil.</li></ul>
+
+<p>Mas é importante separar <strong>rede de proteção</strong> de <strong>atores políticos e institucionais ampliados</strong>. CLDF, por exemplo, não é propriamente serviço da rede de proteção; é ator normativo, fiscalizador e orçamentário.</p>
+
+<h3>Módulo 3 — Análise jurisprudencial</h3>
+
+<p>Você pode usar a pesquisa do Instituto Alana com a FGV Direito SP como base para STF e STJ. As fontes localizadas destacam que a pesquisa analisou decisões das cortes superiores sobre prioridade absoluta entre 1988 e 2019. <sup class="cite">[<a href="https://alana.org.br/prioridade-absoluta-criancas/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Livro traz decisões sobre direitos das crianças e adolescentes">Alana</a>]</sup></p>
+
+<p>Aqui faço uma ressalva: você mencionou “Instituto Alana em parceria com FGV Direito SP e Fiocruz”. Nas fontes que localizei, aparecem principalmente <strong>Instituto Alana e FGV Direito SP/Supremo em Pauta</strong>. Eu conferiria a participação da Fiocruz antes de manter essa referência.</p>
+
+<p>Para o TJDFT, há material útil no próprio tribunal sobre proteção integral, prioridade absoluta, depoimento especial e jurisprudência em temas de infância e adolescência. <sup class="cite">[<a href="https://www.tjdft.jus.br/consultas/jurisprudencia/jurisprudencia-em-temas/direito-da-crianca-e-do-adolescente-na-visao-do-tjdft/dos-principios-e-fundamentos/principio-da-protecao-integral-direito-das-criancas-e-dos-adolescentes?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Princípio da proteção integral – direito da criança e do ...">TJDFT</a>]</sup></p>
+
+<h3>Módulo 4 — Estudo de caso</h3>
+
+<p>O estudo de caso pode ser muito forte, mas deve ser subordinado ao argumento geral. Ele não deve virar uma segunda pesquisa independente.</p>
+
+<p>Função sugerida:</p>
+
+<blockquote><p>O estudo de caso servirá para reconstruir concretamente como fatores de risco, omissões institucionais, respostas da rede de proteção e discursos jurídicos se cruzam em uma morte violenta intencional específica.</p></blockquote>
+
+<h2>10. Matriz de coerência sugerida</h2>
+
+<table><thead><tr><th>Pergunta</th><th>Fonte</th><th>Método</th><th>Resultado esperado</th></tr></thead><tbody><tr><td>Como crianças e adolescentes morrem violentamente no DF?</td><td>SIM/DATASUS, SSP-DF, FBSP</td><td>análise estatística descritiva</td><td>perfil das mortes</td></tr><tr><td>Quais fatores de risco aparecem?</td><td>dados de mortalidade, território, documentos institucionais</td><td>cruzamento descritivo e análise contextual</td><td>mapa de vulnerabilidades</td></tr><tr><td>O que a rede prioriza?</td><td>planos, programas, relatórios, protocolos</td><td>análise documental/de conteúdo</td><td>prioridades institucionais declaradas</td></tr><tr><td>O que o Judiciário entende por prioridade absoluta?</td><td>STF, STJ, TJDFT, relatório Alana/FGV</td><td>análise de conteúdo jurisprudencial</td><td>categorias jurídicas dominantes</td></tr><tr><td>Há descompasso entre risco e proteção?</td><td>comparação dos módulos anteriores</td><td>análise interpretativa</td><td>argumento central da pesquisa</td></tr></tbody></table>
+
+<h2>11. Ponto jurídico importante a acrescentar</h2>
+
+<p>Inclua a <strong>Lei 14.811/2024</strong>, especialmente como marco recente de proteção contra violência em estabelecimentos educacionais ou similares e alterações penais relacionadas à violência contra crianças e adolescentes. Ela não precisa ser o centro da pesquisa, mas pode aparecer no capítulo jurídico-normativo, especialmente se você trabalhar violência escolar, bullying, cyberbullying ou prevenção institucional. <sup class="cite">[<a href="https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/lei/L14811.htm?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="L14811 - Planalto">Planalto</a>]</sup></p>
+
+<h2>12. Hipótese ou pressuposto de trabalho</h2>
+
+<p>Você ainda não apresentou hipótese. Mesmo em pesquisa exploratória, vale formular um pressuposto.</p>
+
+<p>Sugestão:</p>
+
+<blockquote><p><strong>A hipótese é que as mortes violentas intencionais de crianças e adolescentes no Distrito Federal se concentram em determinados perfis sociais e territoriais, mas as prioridades institucionais da rede de proteção nem sempre correspondem de forma direta a esses fatores de risco, revelando um descompasso entre a promessa constitucional da prioridade absoluta e a distribuição concreta da proteção estatal.</strong></p></blockquote>
+
+<p>Essa hipótese conversa bem com necropolítica, porque permite analisar como certas vidas infantis e adolescentes são formalmente prioritárias, mas materialmente expostas à morte.</p>
+
+<h2>13. Melhor estrutura possível para o projeto</h2>
+
+<p>Sugestão de sumário:</p>
+
+<ol><li><strong>Introdução</strong><ul><li>problema;</li><li>justificativa;</li><li>relação com a monografia;</li><li>relevância jurídica e social.</li></ul></li></ol>
+
+<ol><li><strong>Delimitação do objeto</strong><ul><li>crianças e adolescentes;</li><li>Distrito Federal;</li><li>morte violenta intencional;</li><li>rede de proteção;</li><li>prioridade absoluta.</li></ul></li></ol>
+
+<ol><li><strong>Marco teórico</strong><ul><li>necropolítica;</li><li>direito, Estado e seletividade;</li><li>infância, proteção integral e prioridade absoluta;</li><li>violência letal, território e vulnerabilidade.</li></ul></li></ol>
+
+<ol><li><strong>Metodologia</strong><ul><li>abordagem multimétodo;</li><li>análise estatística;</li><li>análise documental;</li><li>análise jurisprudencial;</li><li>estudo de caso;</li><li>critérios de seleção do corpus.</li></ul></li></ol>
+
+<ol><li><strong>Corpus empírico</strong><ul><li>bases de mortalidade;</li><li>documentos da rede de proteção;</li><li>decisões judiciais;</li><li>caso selecionado.</li></ul></li></ol>
+
+<ol><li><strong>Resultados esperados</strong><ul><li>identificação de fatores de risco;</li><li>mapeamento de prioridades institucionais;</li><li>avaliação do princípio da prioridade absoluta como parâmetro jurídico-político;</li><li>contribuição para políticas de prevenção.</li></ul></li></ol>
+
+<h2>14. Avaliação final</h2>
+
+<p>O projeto é muito promissor, mas a versão atual ainda está mais próxima de um <strong>mapa de interesses de pesquisa</strong> do que de um <strong>desenho metodológico fechado</strong>. A melhoria principal é fazer com que todos os elementos respondam à mesma pergunta: <strong>a proteção institucional está sendo orientada pelos riscos reais de morte?</strong></p>
+
+<p>Eu priorizaria esta tríade:</p>
+
+<p><strong>mortes violentas intencionais no DF</strong>  </p>
+<p>+  </p>
+<p><strong>prioridades da rede de proteção</strong>  </p>
+<p>+  </p>
+<p><strong>prioridade absoluta como critério de avaliação jurídica e política</strong>.</p>
+
+<p>Com esse ajuste, a necropolítica deixa de ser apenas referência teórica abstrata e passa a funcionar como chave interpretativa para examinar a distância entre <strong>vida formalmente prioritária</strong> e <strong>vida concretamente exposta à morte</strong>.</p></div></div>
+    <div class="message user-message"><div class="content"><p>hipótese: que a categoria jurídica da prioridade absoluta não enfrenta fatores de risco da maior parte das mortes violentas de crianças e adolescentes, fica mais restrito a fatos juríidicos e sociais de direito e relações privadas</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Sim. A hipótese é <strong>boa e mais sofisticada</strong> do que a anterior, porque desloca o foco para uma possível <strong>limitação interna do discurso jurídico da prioridade absoluta</strong>.</p>
+
+<p>Eu refinaria assim:</p>
+
+<p>:::writing{variant="document" id="48291"}</p>
+<p><strong>Hipótese central</strong></p>
+
+<p>A hipótese da pesquisa é que a categoria jurídica da prioridade absoluta, tal como mobilizada pelo Judiciário e pelas instituições de proteção, tende a não enfrentar diretamente os principais fatores de risco associados às mortes violentas de crianças e adolescentes no Distrito Federal. Em vez de operar como parâmetro estrutural de prevenção da letalidade infantojuvenil, a prioridade absoluta aparece com maior frequência vinculada a conflitos jurídico-sociais individualizados, especialmente aqueles relacionados a relações familiares, guarda, convivência, adoção, educação, saúde, assistência e responsabilidades privadas ou interpessoais. Com isso, fatores como território, raça, gênero, violência armada, violência policial, exploração sexual, evasão escolar, desigualdade socioespacial e exposição cotidiana à violência letal tendem a permanecer marginalizados na formulação jurídica e institucional da proteção prioritária.</p>
+<p>:::</p>
+
+<p>Essa formulação é mais adequada porque evita dizer, antes da pesquisa, que isso ocorre em “maior parte” das mortes. O ideal é usar expressões como <strong>“tende a”</strong>, <strong>“hipoteticamente”</strong>, <strong>“em princípio”</strong> ou <strong>“a pesquisa parte do pressuposto de que”</strong>, pois a confirmação dependerá dos dados.</p>
+
+<p>Uma versão mais curta:</p>
+
+<p>:::writing{variant="document" id="73064"}</p>
+<p><strong>Hipótese resumida</strong></p>
+
+<p>A pesquisa parte da hipótese de que a prioridade absoluta, embora seja uma categoria constitucional central para a proteção de crianças e adolescentes, tende a ser mobilizada de forma limitada pelo Judiciário e pela rede de proteção, concentrando-se em conflitos jurídico-sociais individualizados e relações privadas, sem enfrentar de maneira suficiente os fatores estruturais de risco associados às mortes violentas intencionais de crianças e adolescentes no Distrito Federal.</p>
+<p>:::</p>
+
+<p>E uma versão mais forte, com linguagem mais crítica:</p>
+
+<p>:::writing{variant="document" id="19537"}</p>
+<p><strong>Hipótese crítica</strong></p>
+
+<p>A hipótese é que há um descompasso entre a promessa constitucional da prioridade absoluta e sua operacionalização jurídica e institucional. Embora crianças e adolescentes sejam formalmente reconhecidos como sujeitos de proteção prioritária, a categoria da prioridade absoluta tende a ser aplicada sobretudo a conflitos familiares, educacionais, assistenciais e individuais, deixando em segundo plano os fatores estruturais que produzem maior exposição de determinados grupos infantojuvenis à morte violenta. Assim, a prioridade absoluta pode funcionar mais como princípio de tutela jurídica de situações individualizadas do que como critério efetivo de prevenção da letalidade de crianças e adolescentes em contextos marcados por desigualdade territorial, racial, econômica e institucional.</p>
+<p>:::</p>
+
+<p>Eu usaria a <strong>terceira versão</strong> como hipótese principal do projeto, porque ela conversa melhor com <strong>necropolítica</strong>, <strong>teorias críticas do direito</strong> e <strong>prioridade absoluta</strong>.</p>
+
+<p>Também sugiro transformar a hipótese em três sub-hipóteses:</p>
+
+<table><thead><tr><th>Dimensão</th><th>Sub-hipótese</th></tr></thead><tbody><tr><td>Jurisprudencial</td><td>O STF, o STJ e o TJDFT tendem a mobilizar a prioridade absoluta em temas como família, saúde, educação, guarda, acolhimento, adoção e medidas protetivas, mais do que em casos ligados à prevenção da letalidade infantojuvenil.</td></tr><tr><td>Institucional</td><td>A rede de proteção do DF pode reconhecer formalmente a prioridade de crianças e adolescentes, mas nem sempre organiza suas práticas preventivas a partir dos fatores concretos de risco de morte violenta.</td></tr><tr><td>Crítico-teórica</td><td>A distância entre prioridade normativa e exposição concreta à morte revela uma seletividade da proteção estatal, permitindo diálogo com a necropolítica e com teorias críticas do direito.</td></tr></tbody></table>
+
+<p>Uma formulação metodológica importante seria:</p>
+
+<blockquote><p>A hipótese será testada por meio da comparação entre os fatores de risco identificados nos dados sobre mortes violentas intencionais de crianças e adolescentes no DF e os temas, categorias e prioridades presentes em decisões judiciais, documentos institucionais e políticas da rede de proteção.</p></blockquote>
+
+<p>Isso deixa claro <strong>como</strong> você pretende verificar a hipótese, e não apenas afirmá-la teoricamente.</p></div></div>
+    <div class="message user-message"><div class="content"><p>essas foram minhas conclusões no tcc: </p>
+<p>Encaminhando às considerações finais, vou começar respondendo à pergunta de</p>
+<p>pesquisa – “Como crianças e adolescentes tem sido mortes no Brasil nos últimos quatro</p>
+<p>anos?” – e aos objetivos estabelecidos na Introdução:</p>
+<p>O objetivo principal é fazer um panorama sobre o cenário de violências fatais</p>
+<p>intencionais e evitáveis contra crianças e adolescentes no Brasil entre 2020 e 2024.</p>
+<p>Os objetivos específicos são: (a) identificar o que a literatura científica de pesquisa</p>
+<p>em direito tem produzido em termos de teoria sobre direitos de e violências contra</p>
+<p>crianças e adolescentes; (b) identificar riscos às vidas de crianças e adolescentes que</p>
+<p>não são necessariamente acessíveis através da literatura jurídica tradicional; (c)</p>
+<p>identificar como instituições de Estado e de governo têm lidado com violências</p>
+<p>fatais contra crianças e adolescentes; (d) contribuir com a produção de memória</p>
+<p>coletiva sobre violências fatais contra crianças e adolescentes, especialmente entre</p>
+<p>2020 e 2024.</p>
+<p>O panorama de violências fatais e intencionais contra crianças e adolescentes entre</p>
+<p>2020 e 2024 demonstra que as formas com que essa população tem sido vitimada, ês agentes</p>
+<p>de produção de morte, e os riscos a que estão submetides são muites e variades, podendo ter</p>
+<p>extrapolado o escopo da pesquisa. Mesmo assim, identifiquei que crianças e adolescentes têm</p>
+<p>sido mortes pela polícia, no contexto de guerra às drogas; por pais, mães, madrastas e</p>
+<p>padrastos, pela violência interpessoal em casa; por agentes de violência no campo, em</p>
+<p>contextos de invasão de terras indígenas; por agentes de violência interpessoal em cidades,</p>
+<p>fora de casa; por agentes de descuido e abandono a partir da desumanização e adultização de</p>
+<p>crianças negras. Todas essas formas como têm morrido são contextualizadas e materializadas</p>
+<p>por diversos fatores de risco, que foram abordados.</p>
+<p>Quanto à literatura científica de pesquisa sobre direito de e violências contra crianças e</p>
+<p>adolescentes, as violências mais citadas são relativas ao ambiente doméstico; o</p>
+<p>adultocentrismo e o neoliberalismo são reconhecidos enquanto fatores estruturais que</p>
+<p>prejudicam crianças e adolescentes; e há relativo consenso de que o status de sujeites de</p>
+<p>107</p>
+<p>direitos, a doutrina da proteção integral e da prioridade absoluta e os dispositivos do ECA são</p>
+<p>garantias mais formais do que efetivadas nas vidas da maioria das crianças e adolescentes.</p>
+<p>Minoritariamente, algumas produções problematizam o paradigma da proteção</p>
+<p>integral e o entendimento de que crianças e adolescentes estão “em desenvolvimento”. A</p>
+<p>maioria das produções não parte da intersecção entre marcadores sociais da</p>
+<p>diferença/igualdade/desigualdade para analisar a situação jurídica e social de crianças e</p>
+<p>adolescentes. Mesmo que muitas fontes reconheçam que a infância é uma categoria europeia,</p>
+<p>poucas fazem relação entre adultocentrismo e colonialismo.</p>
+<p>De forma semelhante, apesar de reconhecer o neoliberalismo como parte do problema,</p>
+<p>a literatura majoritária se restringe à caracterização das consequências socioeconômicas e de</p>
+<p>fragmentação das políticas públicas. Poucas produções relacionam o neoliberalismo à crise do</p>
+<p>cuidado, ao familismo, às violências interpessoais ou às violências estatais.</p>
+<p>Nesse sentido, a necropolítica é uma categoria também minoritária na produção</p>
+<p>acadêmica sobre violências contra e mortes de crianças e adolescentes. No entanto, a base</p>
+<p>teórica sobre necropolítica mostrou-se essencial para analisar violências fatais em contexto</p>
+<p>neoliberal. Isso porque situa a violência letal como fenômeno social e coletivo, adereça causas</p>
+<p>e formas como se dá, bem como ês agentes que a produzem. Também, aponta que muitas</p>
+<p>mortes são produzidas de forma intencional, ainda que o dolo não seja reconhecido pelo</p>
+<p>direito.</p>
+<p>Então, ao contrário da literatura majoritária, as análises sobre mortes violentas que</p>
+<p>incorporam a perspectiva da necropolítica não restringem questões relativas a infâncias e</p>
+<p>adolescências e consideram que crianças e adolescentes estão submetides às condições de</p>
+<p>vida de suas comunidades de pertença. Nesse sentido, essas mostram-se mais socialmente</p>
+<p>referenciadas e frutíferas do ponto de vista da função social da ciência.</p>
+<p>Alguns riscos às vidas de crianças e adolescentes, identificados na pesquisa empírica,</p>
+<p>mas que não constam na literatura majoritária são: o familismo, o racismo estrutural e</p>
+<p>institucional, a supremacia branca, a concentração fundiária, a gentrificação, o Marco</p>
+<p>Temporal de Ocupação, a invasão de terras de povos e comunidades tradicionais, o</p>
+<p>cisheteropatriarcado, o pacto narcísico da branquitude, a branquitude, a guerra às drogas, as</p>
+<p>polícias, a neuronormatividade, a transfobia, o agronegócio, a precariedade das condições de</p>
+<p>trabalho e exploração sem limites de trabalhadoras domésticas, os pânicos morais, o avanço</p>
+<p>neoconservador, a individualização da responsabilidade pelo cuidado, o pacto adultocêntrico</p>
+<p>de não-intervenção, o punitivismo, e o armamento da população.</p>
+<p>108</p>
+<p>Sobre as reações estatais e governamentais diante de MVIs de crianças e adolescentes,</p>
+<p>elas têm variado de acordo com as identidades e marcadores sociais tanto das crianças e</p>
+<p>adolescentes e de suas comunidades de pertença quanto dês agentes das mortes. De forma</p>
+<p>geral, adultes branques cisgênero que formam famílias tradicionais não têm enfrentado o</p>
+<p>Estado penal até que matem crianças e adolescentes sob sua guarda e/ou responsabilidade e</p>
+<p>quando o dolo é evidente e reconhecido.</p>
+<p>O reconhecimento de dolo varia conforme o contexto da morte e a identidade das</p>
+<p>vítimas e dês agentes. Em situações de violência interpessoal em que a morte resultou de</p>
+<p>agressões físicas, como nos casos de Bernardo, Sophia e Keron, o dolo foi reconhecido. Já no</p>
+<p>caso da violência policial letal contra adolescente racializade, como contra João Pedro, o dolo</p>
+<p>não foi reconhecido. No caso de morte de criança racializada decorrente do abandono e</p>
+<p>submissão intencional ao risco por mulher branca cisgênero empoderada, como no caso de</p>
+<p>Miguel, o dolo também não foi reconhecido.</p>
+<p>Essa forma de atribuir dolo individualiza a intencionalidade e desconsidera as</p>
+<p>violências raciais produtoras de mortes. Isso reitera a importância de considerar o paradigma</p>
+<p>da necropolítica para analisar as mortes e para definir tanto o caráter de “morte violenta”</p>
+<p>como o caráter de “morte intencional”.</p>
+<p>Além disso, as instituições estatais estão falhando sistematicamente em fazer análise</p>
+<p>de riscos e garantir proteção condizente para crianças e adolescentes. Não há uma relação de</p>
+<p>causalidade e proporcionalidade entre o esforço protetivo para quem se destina</p>
+<p>discursivamente a proteção e o potencial de produção de danos de quem ou do que se</p>
+<p>pretende proteger. Os esforços protetivos e condenatórios parecem estar mais associados aos</p>
+<p>marcadores sociais das pessoas do que aos riscos, e estão sendo operados frequentemente</p>
+<p>segundo lógicas brancosupremacistas, racistas e cisheteropatriarcais. Com isso, muitas das</p>
+<p>políticas e ações discursivamente apontadas como de proteção a crianças e adolescentes têm</p>
+<p>produzido mais vulnerabilização e violência para elas e suas comunidades.</p>
+<p>Ficou evidente, pela pesquisa, que toda operação jurídica e/ou política precisa</p>
+<p>considerar crianças e adolescentes. Afinal, esses grupos não estão insulados de suas</p>
+<p>comunidades de pertença, vivem as consequências dos fatos e ações jurídico-politiques que</p>
+<p>afetam seus territórios, as pessoas responsáveis por cuidar-lhes e as pessoas com quem</p>
+<p>com-vivem.</p>
+<p>Nesse sentido, a decisão do TST sobre a violação dos direitos trabalhistas de Mirtes e</p>
+<p>de Marta é paradigmática: contraria a suposição majoritária de que temas relevantes no</p>
+<p>109</p>
+<p>âmbito dos direitos de crianças e adolescentes são restritos a espaços privados e a condições</p>
+<p>específicas, dissociadas de contextos socioestruturais; e reconhece que crianças e adolescentes</p>
+<p>participam de e estão inserides em suas comunidades de pertença, de forma que tudo que</p>
+<p>impacta suas comunidades e ês adultes responsáveis por cuidar-lhes impacta também suas</p>
+<p>condições de vida. Também, reconhece e recorre à produção intelectual e política de mulheres</p>
+<p>negras que apontam e se contrapõem ao racismo estrutural e institucional para analisar uma</p>
+<p>situação de violação de direitos de mulheres negras empregadas domésticas. Com isso, aponta</p>
+<p>que considerar e incorporar epistemologias e matrizes interpretativas produzidas/propostas</p>
+<p>por grupos dominados para analisar e decidir sobre suas realidades é essencial para produzir</p>
+<p>justiça substantiva.</p>
+<p>Assim, é um exemplo de reação estatal diante da MVI de uma criança que foge às</p>
+<p>reações majoritárias verificadas na revisão bibliográfica e na pesquisa exploratória. Essa</p>
+<p>decisão é coerente com e se propõe a materializar as propostas jurídico-normativas de que os</p>
+<p>direitos de crianças e adolescentes e a garantia de que não sejam violentades sejam</p>
+<p>prioridades absolutas e responsabilidades coletivas. Então, suas metodologias e perspectivas</p>
+<p>têm potencial para serem replicadas em outros procedimentos jurídicos e políticos.</p>
+<p>Dessa forma, considero que a pergunta de pesquisa foi respondida e que todos os</p>
+<p>objetivos foram alcançados, com exceção do último. O último objetivo específico, de</p>
+<p>contribuir com a memória coletiva, vai ser alcançado depois que este trabalho for</p>
+<p>disponibilizado em repositórios de acesso público e acessado por outras pessoas.</p>
+<p>Por fim, proponho que os mecanismos em torno da necropolítica recebam maiores</p>
+<p>investigações, inclusive em relação a crianças e adolescentes, considerando que trata-se de um</p>
+<p>fenômeno complexo e que se transforma em diferentes territórios e contextos.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>As conclusões do TCC dão uma base muito forte para o novo projeto: ele não começa do zero, mas como uma investigação de continuidade, agora com recorte territorial no DF e com teste mais preciso sobre a prioridade absoluta.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Essas conclusões mudam positivamente o projeto. Elas deixam claro que a nova pesquisa não deve ser apenas sobre <strong>mortes violentas no DF</strong>, mas sobre uma tensão mais específica:</p>
+
+<blockquote><p><strong>o direito reconhece crianças e adolescentes como prioridade absoluta, mas a categoria jurídica da prioridade absoluta tende a não alcançar os fatores estruturais que produzem a morte violenta dessa população.</strong></p></blockquote>
+
+<p>Ou seja: o novo projeto pode ser apresentado como <strong>desdobramento direto do TCC</strong>, com uma passagem metodológica importante:</p>
+
+<table><thead><tr><th>TCC</th><th>Novo projeto</th></tr></thead><tbody><tr><td>Panorama nacional 2020–2024</td><td>Recorte territorial no Distrito Federal</td></tr><tr><td>Mortes violentas, intencionais e evitáveis</td><td>Mortes violentas intencionais no DF</td></tr><tr><td>Literatura jurídica e necropolítica</td><td>Jurisprudência, rede de proteção e prioridade absoluta</td></tr><tr><td>Casos paradigmáticos nacionais</td><td>Dados locais + documentos institucionais + TJDFT</td></tr><tr><td>Conclusão crítica sobre seletividade da proteção</td><td>Teste empírico-jurídico da hipótese no DF</td></tr></tbody></table>
+
+<h2>1. Núcleo forte que sai do TCC</h2>
+
+<p>A conclusão mais importante do TCC, para o novo projeto, é esta:</p>
+
+<blockquote><p>A proteção jurídica da infância e adolescência é discursivamente universal, mas opera seletivamente: reconhece melhor certos riscos — sobretudo domésticos, familiares, individualizados e privados — e tem mais dificuldade de reconhecer riscos estruturais, raciais, territoriais, policiais, econômicos e comunitários.</p></blockquote>
+
+<p>Esse é o ponto que deve virar o <strong>centro da nova pesquisa</strong>.</p>
+
+<h2>2. Hipótese refinada a partir do TCC</h2>
+
+<p>Eu formularia assim:</p>
+
+<p>:::writing{variant="document" id="64827"}</p>
+<p><strong>Hipótese central</strong></p>
+
+<p>A pesquisa parte da hipótese de que a categoria jurídica da prioridade absoluta, embora constitucionalmente formulada como dever amplo, coletivo e prioritário de proteção à vida de crianças e adolescentes, tende a ser operacionalizada pelo Judiciário e pelas instituições de proteção de modo restrito a conflitos jurídico-sociais individualizados, especialmente ligados à família, guarda, convivência, educação, saúde, assistência, negligência doméstica e relações privadas. Com isso, fatores estruturais associados à maior parte das mortes violentas de crianças e adolescentes — como território, raça, violência policial, guerra às drogas, violência armada, desigualdade socioespacial, exploração do trabalho de cuidado, familismo, racismo institucional e exposição comunitária à letalidade — permanecem insuficientemente enfrentados como problemas próprios da prioridade absoluta.</p>
+<p>:::</p>
+
+<p>Essa versão aproveita muito bem suas conclusões do TCC, mas transforma a afirmação em <strong>hipótese testável</strong>.</p>
+
+<h2>3. Versão mais crítica e mais próxima da necropolítica</h2>
+
+<p>:::writing{variant="document" id="90314"}</p>
+<p><strong>Hipótese crítica</strong></p>
+
+<p>A hipótese é que existe um descompasso entre a prioridade absoluta como promessa constitucional de proteção integral e sua mobilização jurídica e institucional concreta. Embora o direito afirme que crianças e adolescentes devem receber proteção prioritária contra toda forma de violência, a categoria da prioridade absoluta tende a tornar juridicamente mais visíveis violações situadas no âmbito familiar, privado e interpessoal, enquanto fatores necropolíticos de produção da morte — racismo estrutural, violência estatal, guerra às drogas, desigualdade territorial, precarização do cuidado, adultocentrismo, cisheteropatriarcado e exposição de comunidades inteiras à morte — permanecem marginalizados. Assim, a prioridade absoluta pode funcionar menos como tecnologia de prevenção da letalidade infantojuvenil e mais como categoria jurídica de tutela seletiva de conflitos considerados legíveis pelo direito.</p>
+<p>:::</p>
+
+<p>Essa é a formulação mais potente teoricamente.</p>
+
+<h2>4. Como suas conclusões reorganizam o problema de pesquisa</h2>
+
+<p>Sua pergunta central pode ficar mais afiada. Em vez de perguntar apenas como a rede organiza prioridades, sugiro:</p>
+
+<blockquote><p><strong>Em que medida a categoria jurídica da prioridade absoluta, tal como mobilizada pelo Judiciário e pela rede de proteção do Distrito Federal, enfrenta os fatores de risco associados às mortes violentas intencionais de crianças e adolescentes, especialmente aqueles de natureza estrutural, territorial, racial e institucional?</strong></p></blockquote>
+
+<p>Essa pergunta conversa diretamente com o TCC.</p>
+
+<p>Ela permite investigar três coisas:</p>
+
+<ol><li><strong>quais crianças e adolescentes morrem violentamente no DF;</strong></li><li><strong>quais fatores de risco aparecem nessas mortes;</strong></li><li><strong>se a prioridade absoluta reconhece esses fatores como problemas jurídicos e políticos prioritários.</strong></li></ol>
+
+<h2>5. Como transformar as conclusões do TCC em pressupostos do novo projeto</h2>
+
+<p>Eu usaria as conclusões do TCC como <strong>pressupostos analíticos</strong>, não como conclusões antecipadas. Algo assim:</p>
+
+<table><thead><tr><th>Achado do TCC</th><th>Como entra no novo projeto</th></tr></thead><tbody><tr><td>A literatura jurídica privilegia violência doméstica e familiar</td><td>Verificar se o mesmo ocorre na jurisprudência sobre prioridade absoluta</td></tr><tr><td>Riscos estruturais aparecem pouco na literatura jurídica tradicional</td><td>Comparar com os fatores de risco das mortes no DF</td></tr><tr><td>Necropolítica ajuda a compreender mortes intencionais não reconhecidas como dolosas pelo direito</td><td>Usar necropolítica para discutir limites jurídicos da intencionalidade e da proteção</td></tr><tr><td>Reações estatais variam conforme raça, classe, gênero e posição social de vítimas e agentes</td><td>Investigar seletividade da proteção e da responsabilização</td></tr><tr><td>A decisão do TST no caso Miguel é exceção paradigmática</td><td>Usá-la como contraponto teórico-metodológico, não necessariamente como centro empírico</td></tr></tbody></table>
+
+<h2>6. Ajuste importante no marco teórico</h2>
+
+<p>Com essas conclusões, eu reduziria o marco teórico a quatro eixos principais:</p>
+
+<h3>Eixo 1 — Necropolítica, morte e intencionalidade</h3>
+
+<p>Aqui entram Mbembe e sua crítica à produção política da morte. Esse eixo serve para mostrar que a morte violenta de crianças e adolescentes não pode ser lida apenas como evento individual, acidente, crime privado ou falha familiar.</p>
+
+<h3>Eixo 2 — Adultocentrismo, familismo e crise do cuidado</h3>
+
+<p>Esse eixo é essencial porque aparece muito forte no seu TCC. Ele permite criticar a tendência de jogar a proteção de crianças e adolescentes para a família, apagando Estado, território, trabalho, raça e condições materiais de cuidado.</p>
+
+<h3>Eixo 3 — Racismo, território e seletividade da proteção</h3>
+
+<p>Aqui entram racismo estrutural, branquitude, violência policial, guerra às drogas, desigualdade territorial e exposição comunitária à morte. Esse eixo é central para o recorte no DF.</p>
+
+<h3>Eixo 4 — Prioridade absoluta e crítica jurídica</h3>
+
+<p>Aqui você analisa Constituição, ECA, proteção integral, STF, STJ, TJDFT e a possível limitação da categoria da prioridade absoluta.</p>
+
+<h2>7. O melhor encaixe para o caso Miguel</h2>
+
+<p>O caso Miguel não deve competir com o recorte do DF. Ele pode cumprir outra função: ser o <strong>caso paradigmático que revelou, no TCC, uma possibilidade contra-hegemônica de interpretação jurídica</strong>.</p>
+
+<p>Eu colocaria assim:</p>
+
+<blockquote><p>A decisão do TST no caso Miguel será tomada como referência analítica por demonstrar a possibilidade de interpretar a morte de uma criança a partir de relações estruturais de raça, classe, trabalho, cuidado e responsabilidade institucional, deslocando a análise de uma moldura estritamente privada ou familiar.</p></blockquote>
+
+<p>Assim, ele vira <strong>parâmetro crítico</strong>, não o objeto principal.</p>
+
+<h2>8. Nova tese provisória do projeto</h2>
+
+<p>A tese provisória pode ser esta:</p>
+
+<blockquote><p>A prioridade absoluta, quando não articulada aos fatores estruturais de produção da morte, corre o risco de proteger juridicamente apenas a infância que o direito consegue reconhecer: a infância situada em conflitos familiares, privados, assistenciais ou judicialmente individualizáveis. Crianças e adolescentes expostos à violência letal por razões territoriais, raciais, policiais, econômicas e comunitárias tendem a aparecer menos como sujeitos da prioridade absoluta e mais como vítimas de problemas tratados por outras gramáticas institucionais, como segurança pública, criminalidade, vulnerabilidade social ou responsabilidade familiar.</p></blockquote>
+
+<p>Essa formulação é muito boa para uma tese/projeto porque cria uma tensão analítica clara: <strong>quem é reconhecido como criança prioritária pelo direito?</strong></p>
+
+<h2>9. Correção de rota para o projeto</h2>
+
+<p>A partir dessas conclusões, eu mudaria levemente o título. Sugestões:</p>
+
+<p><strong>Prioridade absoluta e mortes violentas de crianças e adolescentes no Distrito Federal: limites jurídicos da proteção diante de fatores estruturais de risco</strong></p>
+
+<p>Ou:</p>
+
+<p><strong>Entre proteção integral e necropolítica: prioridade absoluta, fatores de risco e mortes violentas de crianças e adolescentes no Distrito Federal</strong></p>
+
+<p>A segunda é mais forte teoricamente. A primeira é mais institucional e provavelmente mais segura para seleção acadêmica.</p>
+
+<h2>10. Formulação final que eu usaria no projeto</h2>
+
+<p>:::writing{variant="document" id="51782"}</p>
+<p>A presente pesquisa dá continuidade à investigação desenvolvida no trabalho de conclusão de curso, no qual se analisou o panorama das violências fatais, intencionais e evitáveis contra crianças e adolescentes no Brasil entre 2020 e 2024. Naquela pesquisa, verificou-se que a morte violenta de crianças e adolescentes não se restringe a eventos domésticos, interpessoais ou familiares, mas envolve múltiplos fatores de risco, como violência policial, guerra às drogas, racismo estrutural e institucional, desigualdade territorial, violência no campo, precarização do cuidado, adultocentrismo, familismo, cisheteropatriarcado e formas diversas de desumanização de crianças e adolescentes racializados, pobres, indígenas, trans, neurodivergentes ou pertencentes a comunidades vulnerabilizadas.</p>
+
+<p>A partir dessas conclusões, o presente projeto propõe deslocar a análise para o Distrito Federal, investigando se os fatores de risco associados às mortes violentas intencionais de crianças e adolescentes são efetivamente reconhecidos pelas práticas institucionais da rede de proteção e pela mobilização jurídica do princípio da prioridade absoluta. O problema central consiste em saber se a prioridade absoluta opera como categoria capaz de enfrentar os fatores estruturais de produção da letalidade infantojuvenil ou se permanece majoritariamente restrita a conflitos jurídico-sociais individualizados, especialmente aqueles relacionados à família, à assistência, à saúde, à educação e às relações privadas.</p>
+<p>:::</p>
+
+<p>Essa última versão pode entrar quase diretamente na <strong>introdução</strong> ou na <strong>justificativa</strong> do projeto.</p></div></div>
+    <div class="message user-message"><div class="content"><p>refiz a tabela:}</p>
+
+<p>Achado do TCC</p>
+<p>Como entra no novo projeto</p>
+<p>A literatura científica em direitos de crianças e adolescentes privilegia violências ocorridas no ambiente doméstico</p>
+<p>Verificar se o mesmo ocorre na jurisprudência sobre prioridade absoluta</p>
+<p>A forma jurídica de atribuir dolo individualiza a intencionalidade e desconsidera as violências raciais produtoras de mortes. Isso reitera a importância de considerar o paradigma da necropolítica para analisar as mortes e para definir tanto o caráter de “morte violenta”</p>
+<p>como o caráter de “morte intencional”.</p>
+<p>Adotar o conceito proposto no TCC de mortes violentas intencionais, que incluam a necropolítica como chave de interpretação do que se considera como violento e como intencional.</p>
+<p>Riscos estruturais são responsáveis pela maior parte das mortes, mas aparecem pouco na literatura jurídica tradicional</p>
+<p>Comparar com os fatores de risco das mortes no DF.</p>
+<p>A necropolítica é uma categoria essencial para analisar violências fatais em contexto neoliberal, pois situa violência letal como fenômeno social e coletivo, adereça causas e formas como se dá, bem como agentes. Também aponta que muitas mortes são intencionais, mesmo que o dolo não seja reconhecido pelo direito.</p>
+<p>Usar necropolítica como base teórica central para analisar limites jurídicos da proteção e dos discursos protetivos.</p>
+<p>Além disso, as instituições estatais estão falhando sistematicamente em fazer análise de riscos e garantir proteção condizente para crianças e adolescentes. Não há uma relação de causalidade e proporcionalidade entre o esforço protetivo para quem se destina discursivamente a proteção e o potencial de produção de danos de quem ou do que se pretende proteger. Os esforços protetivos e condenatórios parecem estar mais associados aos</p>
+<p>marcadores sociais das pessoas do que aos riscos,</p>
+<p>Investigar as prioridades da rede de proteção no DF e comparar com os fatores de risco de mortes violentas.</p>
+<p>A decisão do TST no caso Miguel é exceção paradigmática</p>
+<p>Usá-la como contraponto teórico-metodológico</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>A tabela ficou <strong>muito melhor</strong>. Ela agora cumpre uma função metodológica clara: mostrar que o novo projeto nasce como <strong>continuidade controlada</strong> do TCC, e não como uma pesquisa inteiramente nova.</p>
+
+<p>Eu faria três ajustes principais:</p>
+
+<ol><li><strong>Reduzir repetições sobre necropolítica</strong>, porque ela aparece em dois achados muito próximos.</li><li><strong>Evitar afirmações absolutas</strong>, como “maior parte das mortes”, salvo se isso estiver muito bem demonstrado no TCC.</li><li><strong>Explicitar o que será testado no DF</strong>, para que a tabela conecte conclusão anterior e desenho metodológico novo.</li></ol>
+
+<p>Uma versão revisada poderia ficar assim:</p>
+
+<p>:::writing{variant="document" id="69482"}</p>
+<table><thead><tr><th>Achado do TCC</th><th>Como entra no novo projeto</th></tr></thead><tbody><tr><td>A literatura científica em direitos de crianças e adolescentes privilegia violências ocorridas no ambiente doméstico, familiar e interpessoal.</td><td>Verificar se a jurisprudência sobre prioridade absoluta também privilegia conflitos familiares, domésticos, assistenciais, educacionais e individualizados, em detrimento de fatores estruturais de produção da morte violenta.</td></tr><tr><td>A forma jurídica de atribuir dolo tende a individualizar a intencionalidade e a desconsiderar violências raciais, territoriais, institucionais e estruturais produtoras de mortes.</td><td>Adotar o conceito proposto no TCC de mortes violentas intencionais, utilizando a necropolítica como chave interpretativa para definir o que será compreendido como “violento” e como “intencional”, ainda que o dolo não seja reconhecido juridicamente.</td></tr><tr><td>Riscos estruturais à vida de crianças e adolescentes — como racismo, violência policial, guerra às drogas, desigualdade territorial, precarização do cuidado, familismo, adultocentrismo e violência institucional — aparecem pouco na literatura jurídica tradicional.</td><td>Comparar esses fatores com os riscos associados às mortes violentas intencionais de crianças e adolescentes no Distrito Federal, verificando quais deles aparecem nos dados empíricos, nos documentos institucionais e nas decisões judiciais.</td></tr><tr><td>A necropolítica mostrou-se categoria essencial para analisar violências fatais em contexto neoliberal, pois permite compreender a violência letal como fenômeno social, coletivo e institucionalmente produzido.</td><td>Utilizar a necropolítica como base teórica central para analisar os limites jurídicos da proteção integral, da prioridade absoluta e dos discursos institucionais de proteção à infância e adolescência.</td></tr><tr><td>As instituições estatais falham sistematicamente em analisar riscos e garantir proteção condizente às crianças e adolescentes. Os esforços protetivos e condenatórios parecem estar mais associados aos marcadores sociais das vítimas e dos agentes do que à intensidade dos riscos concretos de morte.</td><td>Investigar as prioridades da rede de proteção do Distrito Federal e compará-las com os fatores de risco associados às mortes violentas intencionais de crianças e adolescentes, verificando se há correspondência ou descompasso entre risco real e proteção institucional.</td></tr><tr><td>A decisão do TST no caso Miguel constitui exceção paradigmática, por reconhecer dimensões estruturais de raça, classe, gênero, trabalho doméstico, cuidado e responsabilidade institucional na análise da morte de uma criança.</td><td>Utilizá-la como contraponto teórico-metodológico para avaliar outras respostas jurídicas e institucionais às mortes violentas de crianças e adolescentes, especialmente quando tais respostas restringem a análise a conflitos privados ou responsabilidades individuais.</td></tr></tbody></table>
+<p>:::</p>
+
+<p>Eu também sugiro acrescentar uma frase antes da tabela no projeto, para explicar sua função:</p>
+
+<blockquote><p>A tabela a seguir sistematiza os principais achados do trabalho de conclusão de curso e indica como eles serão retomados, aprofundados e testados no novo projeto, agora com recorte empírico no Distrito Federal e com foco específico na relação entre mortes violentas intencionais, rede de proteção e prioridade absoluta.</p></blockquote>
+
+<p>Essa tabela ajuda muito a justificar a continuidade entre TCC e nova pesquisa. O eixo mais forte que aparece nela é:</p>
+
+<p><strong>o TCC identificou fatores estruturais de produção da morte; o novo projeto vai verificar se esses fatores são reconhecidos pela rede de proteção e pela categoria jurídica da prioridade absoluta.</strong></p></div></div>
+    <div class="message user-message"><div class="content"><p>A tabela a seguir sistematiza os principais achados do trabalho de conclusão de curso e indica como eles serão retomados, aprofundados e testados no novo projeto, agora com recorte empírico no Distrito Federal e com foco específico na relação entre mortes violentas intencionais, rede de proteção e prioridade absoluta. Em resumo, o TCC identificou fatores estruturais de produção da morte e distorções nas práticas jurídicas e estatais de avaliação de riscos e produção de proteção diante dos fatores de risco da maior parte das mortes de crianças e adolescentes; o novo projeto vai verificar se esses fatores são reconhecidos pela rede de proteção e pela categoria jurídica da prioridade absoluta.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>A formulação está boa, mas a segunda frase ficou muito longa e carregada. Eu dividiria para ganhar clareza e força argumentativa. Também trocaria “diante dos fatores de risco da maior parte das mortes” por uma construção mais precisa, porque essa parte pode soar redundante e antecipar uma conclusão que o novo projeto ainda vai testar.</p>
+
+<p>Sugestão revisada:</p>
+
+<p>:::writing{variant="document" id="28471"}</p>
+<p>A tabela a seguir sistematiza os principais achados do trabalho de conclusão de curso e indica como eles serão retomados, aprofundados e testados no novo projeto, agora com recorte empírico no Distrito Federal e com foco específico na relação entre mortes violentas intencionais, rede de proteção e prioridade absoluta.</p>
+
+<p>Em síntese, o TCC identificou fatores estruturais de produção da morte de crianças e adolescentes, bem como distorções nas práticas jurídicas e estatais de avaliação de riscos, atribuição de responsabilidade e produção de proteção. O novo projeto parte desses achados para verificar se os fatores de risco associados às mortes violentas intencionais de crianças e adolescentes no Distrito Federal são reconhecidos pela rede de proteção local e pela categoria jurídica da prioridade absoluta.</p>
+<p>:::</p>
+
+<p>Se quiser uma versão mais crítica, com mais aderência à necropolítica:</p>
+
+<p>:::writing{variant="document" id="72936"}</p>
+<p>A tabela a seguir sistematiza os principais achados do trabalho de conclusão de curso e indica como eles serão retomados, aprofundados e testados no novo projeto, agora com recorte empírico no Distrito Federal e com foco específico na relação entre mortes violentas intencionais, rede de proteção e prioridade absoluta.</p>
+
+<p>Em síntese, o TCC identificou que as mortes de crianças e adolescentes são produzidas por fatores não apenas individuais ou familiares, mas também estruturais, territoriais, raciais, institucionais e políticos. Também apontou distorções nas formas jurídicas e estatais de avaliar riscos, atribuir responsabilidade e produzir proteção, especialmente quando os fatores de morte não se ajustam às categorias tradicionais do direito. A partir desses achados, o novo projeto investigará se os fatores de risco associados às mortes violentas intencionais de crianças e adolescentes no Distrito Federal são reconhecidos pelas práticas da rede de proteção e pela categoria jurídica da prioridade absoluta.</p>
+<p>:::</p>
+
+<p>Eu usaria a <strong>segunda versão</strong> se o projeto tiver tom mais crítico-teórico. Ela prepara melhor o leitor para necropolítica, seletividade jurídica e crítica à prioridade absoluta como categoria insuficientemente estrutural.</p></div></div>
+    <div class="message user-message"><div class="content"><p>import requests #conectar com os sites; mandar requisições para os sites.</p>
+<p>from bs4 import BeautifulSoup #parsar o output, resposta do site</p>
+<p>import re #expressões regulares: filtrar o texto, achar a parte que a gente quer</p>
+<p>import demjson3 #converter o que tá em javascript para json</p>
+<p>import json #trabalhar com formato json</p>
+<p>import sqlite3 #trabalhar com o banco de dados</p>
+<p>import os #sistema operacional: caminhos de arquivo</p>
+<p>import time #pausas entre requisições</p>
+
+<p>pesquisa = "quilombos"</p>
+<p>termo = "quilombo território"</p>
+<p>filename = termo.replace(' ', '_')</p>
+<p>SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))</p>
+<p>headers = {'Host': 'www.periodicos.capes.gov.br', #sempre que vamos trabalhar com Web, usamos o protocolo HTTP, composto por requisições e respostas. Cada uma tem cabeçalhos antes dos dados. Este cabeçalho é o que mandamos pro site para ele saber q é legítimo.</p>
+<p>'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0', </p>
+<p>'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,<em>/</em>;q=0.8', </p>
+<p>'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3', </p>
+<p>'Accept-Encoding': 'gzip, deflate, br, zstd', </p>
+<p>'Connection': 'keep-alive', </p>
+<p>"Cookie": '_ga_DSV7MH35Q7=GS2.1.s1779732746\(o2\)g1\(t1779736223\)j47\(l0\)h0; _ga=GA1.1.858055326.1778527229; f8d43d5899660e032f00f861565869ba=70cb7039c937c9c7f200b4ba13cbbdc9; AWSALB=gFIZPmm5zP8GogOGXuLraL7QDkBOHh7gmk2oDsln1df9767YfrLuAQp2S+sib5kX+OXMc63dwX/B7iCMepiCmi4GTq9FhIietzdxYLkNVOQPgRtOcQce4QpfNeAS; AWSALBCORS=gFIZPmm5zP8GogOGXuLraL7QDkBOHh7gmk2oDsln1df9767YfrLuAQp2S+sib5kX+OXMc63dwX/B7iCMepiCmi4GTq9FhIietzdxYLkNVOQPgRtOcQce4QpfNeAS; .periodicos.={"selectAll":true,"cookieGroups":[]}; cookieConsent=true',</p>
+<p>'Upgrade-Insecure-Requests': '1', </p>
+<p>'Sec-Fetch-Dest': </p>
+<p>'document', </p>
+<p>'Sec-Fetch-Mode': </p>
+<p>'navigate', </p>
+<p>'Sec-Fetch-Site': </p>
+<p>'none', </p>
+<p>'Sec-GPC': </p>
+<p>'1', </p>
+<p>'Priority': </p>
+<p>'u=0, i'}</p>
+
+<p>base_url = (</p>
+<p>    'https://www.periodicos.capes.gov.br/index.php/acervo/buscador.html?q=all%3Acontains%28' + termo.replace(' ', '+') </p>
+<p>    + '%29&amp;mode=advanced&amp;source=all')</p>
+
+<p>def scrapear_ids():</p>
+<p>    pasta = os.path.join(SCRIPT_DIR, 'pages')</p>
+<p>    os.makedirs(pasta, exist_ok=True)</p>
+<p>    todos_ids = []</p>
+
+<p>    try:</p>
+<p>        from playwright.sync_api import sync_playwright</p>
+<p>        with sync_playwright() as p:</p>
+<p>            browser = p.chromium.launch(headless=False)</p>
+<p>            context = browser.new_context(</p>
+<p>                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",</p>
+<p>                viewport={"width": 1280, "height": 800})</p>
+<p>            page = context.new_page()</p>
+
+<p>            pagina = 1</p>
+<p>            url = base_url</p>
+<p>            while url:</p>
+<p>                print(f"Acessando página {pagina}...")</p>
+<p>                try:</p>
+<p>                    page.goto(url, wait_until="networkidle", timeout=60000)</p>
+<p>                    time.sleep(2)</p>
+<p>                    html = page.content()</p>
+<p>                except Exception as e:</p>
+<p>                    print(f"Erro na página {pagina}: {e}")</p>
+<p>                    break</p>
+
+<p>                caminho = os.path.join(pasta, f'page_{pagina}.html')</p>
+<p>                with open(caminho, 'w', encoding='utf-8') as f:</p>
+<p>                    f.write(html)</p>
+<p>                print(f"Página {pagina} salva em {caminho}")</p>
+
+<p>                soup = BeautifulSoup(html, 'html.parser')</p>
+<p>                script = soup.find('script', string=re.compile(r'const itens'))</p>
+<p>                if not script:</p>
+<p>                    print("'const itens' não encontrado nesta página.")</p>
+<p>                    break</p>
+
+<p>                m = re.search(r'const\s+itens\s<em>=\s</em>(</p>
+<div class="math-block">\[.*?\]</div>
+<p>);', script.string, re.DOTALL)</p>
+<p>                if not m:</p>
+<p>                    print("Regex não casou nesta página.")</p>
+<p>                    break</p>
+
+<p>                ids_pagina = [a.get('id') for a in demjson3.decode(m.group(1))]</p>
+<p>                todos_ids.extend(ids_pagina)</p>
+<p>                print(f"IDs extraídos da página {pagina}: {len(ids_pagina)}")</p>
+
+<p>                proxima = page.locator('a[href*="start="], a:has-text("próxima"), a:has-text("Próxima"), a:has-text("Next"), li.next a').first</p>
+<p>                if proxima.count() &gt; 0:</p>
+<p>                    try:</p>
+<p>                        proxima.click()</p>
+<p>                        page.wait_for_load_state("networkidle", timeout=30000)</p>
+<p>                        url = page.url</p>
+<p>                        pagina += 1</p>
+<p>                        time.sleep(random.uniform(2, 4))</p>
+<p>                    except Exception:</p>
+<p>                        print("Fim da paginação.")</p>
+<p>                        break</p>
+<p>                else:</p>
+<p>                    break</p>
+
+<p>            browser.close()</p>
+<p>            print(f"Total de IDs coletados: {len(todos_ids)}")</p>
+<p>            return todos_ids</p>
+
+<p>    except ImportError:</p>
+<p>        print("Playwright não instalado. Instale com: pip install playwright &amp;&amp; playwright install chromium")</p>
+<p>        exit(1)</p>
+
+<h1>Tenta pegar IDs via Playwright (paginação automática)</h1>
+<p>ids_encontrados = scrapear_ids()</p>
+
+<h1>Se não conseguiu rodar Playwright, tenta fallback por arquivo</h1>
+<p>if not ids_encontrados:</p>
+<p>    fallback = 'response.html'</p>
+<p>    if not os.path.isfile(fallback):</p>
+<p>        raise FileNotFoundError("Nenhum ID encontrado e arquivo 'response.html' não existe.")</p>
+<p>    with open(fallback, 'r', encoding='utf-8') as f:</p>
+<p>        soup = BeautifulSoup(f.read(), 'html.parser')</p>
+<p>    script = soup.find('script', string=re.compile(r'const itens'))</p>
+<p>    if script:</p>
+<p>        m = re.search(r'const\s+itens\s<em>=\s</em>(</p>
+<div class="math-block">\[.*?\]</div>
+<p>);', script.string, re.DOTALL)</p>
+<p>        if m:</p>
+<p>            ids_encontrados = [a.get('id') for a in demjson3.decode(m.group(1))]</p>
+
+<h1>Remove duplicatas mantendo ordem</h1>
+<p>seen = set()</p>
+<p>json_obj = []</p>
+<p>ids_final = []</p>
+<p>for aid in ids_encontrados:</p>
+<p>    if aid not in seen:</p>
+<p>        seen.add(aid)</p>
+<p>        ids_final.append(aid)</p>
+
+<h1>Reconstroi json_obj mínimo para manter compatibilidade com o restante do script</h1>
+<h1>Busca objetos originais nos HTMLs salvos para não perder title, autor etc.</h1>
+<p>objs = []</p>
+<p>for path in sorted(os.listdir(os.path.join(SCRIPT_DIR, 'pages'))):</p>
+<p>    if not path.endswith('.html'):</p>
+<p>        continue</p>
+<p>    with open(os.path.join(SCRIPT_DIR, 'pages', path), 'r', encoding='utf-8') as f:</p>
+<p>        s = BeautifulSoup(f.read(), 'html.parser')</p>
+<p>    sc = s.find('script', string=re.compile(r'const itens'))</p>
+<p>    if sc:</p>
+<p>        m = re.search(r'const\s+itens\s<em>=\s</em>(</p>
+<div class="math-block">\[.*?\]</div>
+<p>);', sc.string, re.DOTALL)</p>
+<p>        if m:</p>
+<p>            objs.extend(demjson3.decode(m.group(1)))</p>
+
+<h1>Monta dicionário por ID</h1>
+<p>mapa = {o.get('id'): o for o in objs if o.get('id')}</p>
+<p>json_obj = [mapa[i] for i in ids_final if i in mapa]</p>
+
+<p>if not json_obj:</p>
+<p>    raise RuntimeError("Nenhum artigo extraído. Verifique os arquivos HTML ou a conexão.")</p>
+
+<p>print(f"Total de artigos únicos: {len(json_obj)}")</p>
+
+<p>for artigo in json_obj:</p>
+<p>    id_art = artigo.get('id')</p>
+<p>    nurl = f"https://www.periodicos.capes.gov.br/index.php/acervo/buscador.html?task=detalhes&amp;source=all&amp;id={id_art}"</p>
+<p>    try:</p>
+<p>        nresponse = requests.get(nurl, headers=headers, timeout=30)</p>
+<p>        nsoup = BeautifulSoup(nresponse.content, 'html.parser')</p>
+<p>        abs_tag = nsoup.find('meta', attrs={'name': 'abstract'})</p>
+<p>        if abs_tag:</p>
+<p>            abstract = abs_tag.get('content', '')</p>
+<p>        else:</p>
+<p>            abs_tag = nsoup.find('meta', attrs={'property': 'og:description'})</p>
+<p>            abstract = abs_tag.get('content', '') if abs_tag else ''</p>
+<p>        if abstract:</p>
+<p>            artigo['concept'] = abstract</p>
+<p>        else:</p>
+<p>            print(f"Abstract não encontrado para id={id_art}")</p>
+<p>    except Exception as e:</p>
+<p>        print(f"Erro ao buscar detalhe de id={id_art}: {e}")</p>
+
+<p>    time.sleep(random.uniform(2, 5))</p>
+
+<p>conn = sqlite3.connect(f'{pesquisa}.db', isolation_level=None)</p>
+<p>conn.execute(f'CREATE TABLE IF NOT EXISTS {filename} (type TEXT, id TEXT, title TEXT, autor TEXT, resource_title TEXT, publish_year TEXT, volume TEXT, issue TEXT, first_page TEXT, last_page TEXT, doi TEXT, abstract TEXT) STRICT')</p>
+
+<p>for item in json_obj:</p>
+<p>    conn.execute(f'INSERT OR REPLACE INTO {filename} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', </p>
+<p>        (item.get('type'), item.get('id'),</p>
+<p>         item.get('title'), item.get('autor'),</p>
+<p>         item.get('resource_title'), item.get('publish_year'),</p>
+<p>         item.get('volume'), item.get('issue'),</p>
+<p>         item.get('first_page'), item.get('last_page'),</p>
+<p>         item.get('doi'), item.get('concept')))</p>
+
+<p>conn.close()</p>
+<p>print("Concluído.")</p>
+
+
+
+<p>quero que esse código pegue todos as páginas html na pasta Carlos com o nome "{filename}_pagina1", "{filename}_pagina2" etc., de todas que tem esse padrão de nome, só muda o numero da pagina. então, se filename = quilombo_territorio, todos que são quilombo_territorio_pagina{numero da pagina}.html serão raspados e inseridos na base de dados de nome {pesquisa}, neste caso, "quilombos"</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Vou propor a substituição da parte de paginação/Playwright por uma leitura local da pasta <code>Carlos</code>. A lógica fica: localizar arquivos pelo padrão, ordenar pelo número da página, extrair <code>const itens</code>, remover duplicatas e inserir no SQLite.</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Perfeito. Nesse caso você pode <strong>remover toda a parte do Playwright/paginação automática</strong> e fazer o script ler diretamente os HTMLs já salvos na pasta <code>Carlos</code>.</p>
+
+<p>A lógica abaixo procura arquivos como:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">Carlos/quilombo_territorio_pagina1.html
+Carlos/quilombo_territorio_pagina2.html
+Carlos/quilombo_territorio_pagina3.html
+...</pre></div>
+
+
+<p>extrai o <code>const itens = [...]</code> de cada página, remove duplicatas pelo <code>id</code> e insere tudo no banco:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs"><span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">from</span> bs4 <span class="hljs-keyword">import</span> BeautifulSoup
+<span class="hljs-keyword">import</span> re
+<span class="hljs-keyword">import</span> demjson3
+<span class="hljs-keyword">import</span> sqlite3
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">import</span> random
+<span class="hljs-keyword">import</span> unicodedata
+<span class="hljs-keyword">from</span> pathlib <span class="hljs-keyword">import</span> Path
+
+
+<span class="hljs-comment"># =========================</span>
+<span class="hljs-comment"># CONFIGURAÇÕES DA PESQUISA</span>
+<span class="hljs-comment"># =========================</span>
+
+pesquisa = <span class="hljs-string">&quot;quilombos&quot;</span>
+termo = <span class="hljs-string">&quot;quilombo território&quot;</span>
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">slugify</span>(<span class="hljs-params">texto</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Transforma &#x27;quilombo território&#x27; em &#x27;quilombo_territorio&#x27;.
+    Isso evita problema com acento no nome de arquivos e tabelas.
+    &quot;&quot;&quot;</span>
+    texto = unicodedata.normalize(<span class="hljs-string">&quot;NFKD&quot;</span>, texto)
+    texto = texto.encode(<span class="hljs-string">&quot;ascii&quot;</span>, <span class="hljs-string">&quot;ignore&quot;</span>).decode(<span class="hljs-string">&quot;ascii&quot;</span>)
+    texto = texto.lower()
+    texto = re.sub(<span class="hljs-string">r&quot;[^a-z0-9]+&quot;</span>, <span class="hljs-string">&quot;_&quot;</span>, texto)
+    texto = texto.strip(<span class="hljs-string">&quot;_&quot;</span>)
+    <span class="hljs-keyword">return</span> texto
+
+
+filename = slugify(termo)
+
+<span class="hljs-keyword">try</span>:
+    SCRIPT_DIR = Path(__file__).resolve().parent
+<span class="hljs-keyword">except</span> NameError:
+    SCRIPT_DIR = Path.cwd()
+
+PASTA_HTML = SCRIPT_DIR / <span class="hljs-string">&quot;Carlos&quot;</span>
+DB_PATH = SCRIPT_DIR / <span class="hljs-string">f&quot;<span class="hljs-subst">{pesquisa}</span>.db&quot;</span>
+
+headers = {
+    <span class="hljs-string">&quot;Host&quot;</span>: <span class="hljs-string">&quot;www.periodicos.capes.gov.br&quot;</span>,
+    <span class="hljs-string">&quot;User-Agent&quot;</span>: <span class="hljs-string">&quot;Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0&quot;</span>,
+    <span class="hljs-string">&quot;Accept&quot;</span>: <span class="hljs-string">&quot;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&quot;</span>,
+    <span class="hljs-string">&quot;Accept-Language&quot;</span>: <span class="hljs-string">&quot;pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3&quot;</span>,
+    <span class="hljs-string">&quot;Connection&quot;</span>: <span class="hljs-string">&quot;keep-alive&quot;</span>,
+}
+
+
+<span class="hljs-comment"># =========================</span>
+<span class="hljs-comment"># FUNÇÕES AUXILIARES</span>
+<span class="hljs-comment"># =========================</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">quote_identifier</span>(<span class="hljs-params">nome</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Protege o nome da tabela no SQLite.
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&quot;&#x27;</span> + nome.replace(<span class="hljs-string">&#x27;&quot;&#x27;</span>, <span class="hljs-string">&#x27;&quot;&quot;&#x27;</span>) + <span class="hljs-string">&#x27;&quot;&#x27;</span>
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">encontrar_paginas_html</span>(<span class="hljs-params">pasta, filename</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Encontra arquivos no padrão:
+    {filename}_pagina1.html
+    {filename}_pagina2.html
+    etc.
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> pasta.exists():
+        <span class="hljs-keyword">raise</span> FileNotFoundError(<span class="hljs-string">f&quot;A pasta não existe: <span class="hljs-subst">{pasta}</span>&quot;</span>)
+
+    padrao = re.<span class="hljs-built_in">compile</span>(<span class="hljs-string">rf&quot;^<span class="hljs-subst">{re.escape(filename)}</span>_pagina(\d+)\.html$&quot;</span>, re.IGNORECASE)
+
+    arquivos = []
+
+    <span class="hljs-keyword">for</span> arquivo <span class="hljs-keyword">in</span> pasta.iterdir():
+        <span class="hljs-keyword">if</span> arquivo.is_file():
+            <span class="hljs-keyword">match</span> = padrao.<span class="hljs-keyword">match</span>(arquivo.name)
+            <span class="hljs-keyword">if</span> <span class="hljs-keyword">match</span>:
+                numero_pagina = <span class="hljs-built_in">int</span>(<span class="hljs-keyword">match</span>.group(<span class="hljs-number">1</span>))
+                arquivos.append((numero_pagina, arquivo))
+
+    arquivos.sort(key=<span class="hljs-keyword">lambda</span> x: x[<span class="hljs-number">0</span>])
+
+    <span class="hljs-keyword">return</span> [arquivo <span class="hljs-keyword">for</span> _, arquivo <span class="hljs-keyword">in</span> arquivos]
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">extrair_itens_do_html</span>(<span class="hljs-params">caminho_html</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Extrai o array JS declarado como:
+    const itens = [...]
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(caminho_html, <span class="hljs-string">&quot;r&quot;</span>, encoding=<span class="hljs-string">&quot;utf-8&quot;</span>) <span class="hljs-keyword">as</span> f:
+        html = f.read()
+
+    soup = BeautifulSoup(html, <span class="hljs-string">&quot;html.parser&quot;</span>)
+
+    script = soup.find(<span class="hljs-string">&quot;script&quot;</span>, string=re.<span class="hljs-built_in">compile</span>(<span class="hljs-string">r&quot;const\s+itens&quot;</span>))
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> script <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> script.string:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;&#x27;const itens&#x27; não encontrado em: <span class="hljs-subst">{caminho_html.name}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+    <span class="hljs-keyword">match</span> = re.search(
+        <span class="hljs-string">r&quot;const\s+itens\s*=\s*(
+%%MB0%%
+);&quot;</span>,
+        script.string,
+        re.DOTALL
+    )
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">match</span>:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Regex não encontrou array de itens em: <span class="hljs-subst">{caminho_html.name}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+    <span class="hljs-keyword">try</span>:
+        itens = demjson3.decode(<span class="hljs-keyword">match</span>.group(<span class="hljs-number">1</span>))
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">{caminho_html.name}</span>: <span class="hljs-subst">{<span class="hljs-built_in">len</span>(itens)}</span> itens extraídos.&quot;</span>)
+        <span class="hljs-keyword">return</span> itens
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Erro ao converter itens em <span class="hljs-subst">{caminho_html.name}</span>: <span class="hljs-subst">{e}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">remover_duplicatas_por_id</span>(<span class="hljs-params">itens</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Remove duplicatas mantendo a primeira ocorrência de cada id.
+    &quot;&quot;&quot;</span>
+    vistos = <span class="hljs-built_in">set</span>()
+    unicos = []
+
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> itens:
+        id_art = item.get(<span class="hljs-string">&quot;id&quot;</span>)
+
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> id_art:
+            <span class="hljs-keyword">continue</span>
+
+        <span class="hljs-keyword">if</span> id_art <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> vistos:
+            vistos.add(id_art)
+            unicos.append(item)
+
+    <span class="hljs-keyword">return</span> unicos
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">buscar_abstracts</span>(<span class="hljs-params">itens</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Busca o abstract de cada artigo na página de detalhes da CAPES.
+    Pode ser desligado se você quiser trabalhar só com os HTMLs locais.
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> itens:
+        id_art = item.get(<span class="hljs-string">&quot;id&quot;</span>)
+
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> id_art:
+            <span class="hljs-keyword">continue</span>
+
+        nurl = (
+            <span class="hljs-string">&quot;https://www.periodicos.capes.gov.br/index.php/acervo/buscador.html&quot;</span>
+            <span class="hljs-string">f&quot;?task=detalhes&amp;source=all&amp;id=<span class="hljs-subst">{id_art}</span>&quot;</span>
+        )
+
+        <span class="hljs-keyword">try</span>:
+            response = requests.get(nurl, headers=headers, timeout=<span class="hljs-number">30</span>)
+            soup = BeautifulSoup(response.content, <span class="hljs-string">&quot;html.parser&quot;</span>)
+
+            abs_tag = soup.find(<span class="hljs-string">&quot;meta&quot;</span>, attrs={<span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;abstract&quot;</span>})
+
+            <span class="hljs-keyword">if</span> abs_tag:
+                abstract = abs_tag.get(<span class="hljs-string">&quot;content&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+            <span class="hljs-keyword">else</span>:
+                abs_tag = soup.find(<span class="hljs-string">&quot;meta&quot;</span>, attrs={<span class="hljs-string">&quot;property&quot;</span>: <span class="hljs-string">&quot;og:description&quot;</span>})
+                abstract = abs_tag.get(<span class="hljs-string">&quot;content&quot;</span>, <span class="hljs-string">&quot;&quot;</span>) <span class="hljs-keyword">if</span> abs_tag <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;&quot;</span>
+
+            <span class="hljs-keyword">if</span> abstract:
+                item[<span class="hljs-string">&quot;concept&quot;</span>] = abstract
+            <span class="hljs-keyword">else</span>:
+                <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Abstract não encontrado para id=<span class="hljs-subst">{id_art}</span>&quot;</span>)
+
+        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Erro ao buscar detalhe de id=<span class="hljs-subst">{id_art}</span>: <span class="hljs-subst">{e}</span>&quot;</span>)
+
+        time.sleep(random.uniform(<span class="hljs-number">2</span>, <span class="hljs-number">5</span>))
+
+    <span class="hljs-keyword">return</span> itens
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">salvar_no_sqlite</span>(<span class="hljs-params">itens, db_path, nome_tabela</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Salva os registros no banco SQLite.
+    &quot;&quot;&quot;</span>
+    tabela = quote_identifier(nome_tabela)
+
+    conn = sqlite3.connect(db_path, isolation_level=<span class="hljs-literal">None</span>)
+
+    conn.execute(<span class="hljs-string">f&quot;&quot;&quot;
+        CREATE TABLE IF NOT EXISTS <span class="hljs-subst">{tabela}</span> (
+            type TEXT,
+            id TEXT PRIMARY KEY,
+            title TEXT,
+            autor TEXT,
+            resource_title TEXT,
+            publish_year TEXT,
+            volume TEXT,
+            issue TEXT,
+            first_page TEXT,
+            last_page TEXT,
+            doi TEXT,
+            abstract TEXT
+        ) STRICT
+    &quot;&quot;&quot;</span>)
+
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> itens:
+        conn.execute(<span class="hljs-string">f&quot;&quot;&quot;
+            INSERT OR REPLACE INTO <span class="hljs-subst">{tabela}</span>
+            (
+                type,
+                id,
+                title,
+                autor,
+                resource_title,
+                publish_year,
+                volume,
+                issue,
+                first_page,
+                last_page,
+                doi,
+                abstract
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        &quot;&quot;&quot;</span>, (
+            item.get(<span class="hljs-string">&quot;type&quot;</span>),
+            item.get(<span class="hljs-string">&quot;id&quot;</span>),
+            item.get(<span class="hljs-string">&quot;title&quot;</span>),
+            item.get(<span class="hljs-string">&quot;autor&quot;</span>),
+            item.get(<span class="hljs-string">&quot;resource_title&quot;</span>),
+            item.get(<span class="hljs-string">&quot;publish_year&quot;</span>),
+            item.get(<span class="hljs-string">&quot;volume&quot;</span>),
+            item.get(<span class="hljs-string">&quot;issue&quot;</span>),
+            item.get(<span class="hljs-string">&quot;first_page&quot;</span>),
+            item.get(<span class="hljs-string">&quot;last_page&quot;</span>),
+            item.get(<span class="hljs-string">&quot;doi&quot;</span>),
+            item.get(<span class="hljs-string">&quot;concept&quot;</span>),
+        ))
+
+    conn.close()
+
+
+<span class="hljs-comment"># =========================</span>
+<span class="hljs-comment"># EXECUÇÃO PRINCIPAL</span>
+<span class="hljs-comment"># =========================</span>
+
+arquivos_html = encontrar_paginas_html(PASTA_HTML, filename)
+
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> arquivos_html:
+    <span class="hljs-keyword">raise</span> FileNotFoundError(
+        <span class="hljs-string">f&quot;Nenhum arquivo encontrado em <span class="hljs-subst">{PASTA_HTML}</span> com o padrão &quot;</span>
+        <span class="hljs-string">f&quot;<span class="hljs-subst">{filename}</span>_pagina{{n}}.html&quot;</span>
+    )
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Arquivos encontrados: <span class="hljs-subst">{<span class="hljs-built_in">len</span>(arquivos_html)}</span>&quot;</span>)
+
+todos_itens = []
+
+<span class="hljs-keyword">for</span> caminho_html <span class="hljs-keyword">in</span> arquivos_html:
+    itens_pagina = extrair_itens_do_html(caminho_html)
+    todos_itens.extend(itens_pagina)
+
+json_obj = remover_duplicatas_por_id(todos_itens)
+
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> json_obj:
+    <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Nenhum artigo extraído dos HTMLs encontrados.&quot;</span>)
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Total de artigos únicos: <span class="hljs-subst">{<span class="hljs-built_in">len</span>(json_obj)}</span>&quot;</span>)
+
+<span class="hljs-comment"># Se quiser buscar abstracts nas páginas de detalhe da CAPES, mantenha True.</span>
+<span class="hljs-comment"># Se quiser apenas inserir os dados dos HTMLs locais, mude para False.</span>
+BUSCAR_ABSTRACTS = <span class="hljs-literal">True</span>
+
+<span class="hljs-keyword">if</span> BUSCAR_ABSTRACTS:
+    json_obj = buscar_abstracts(json_obj)
+
+salvar_no_sqlite(json_obj, DB_PATH, filename)
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Concluído. Banco salvo em: <span class="hljs-subst">{DB_PATH}</span>&quot;</span>)
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Tabela criada/atualizada: <span class="hljs-subst">{filename}</span>&quot;</span>)</pre></div>
+
+
+<p>O ponto principal é este trecho:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs">padrao = re.<span class="hljs-built_in">compile</span>(<span class="hljs-string">rf&quot;^<span class="hljs-subst">{re.escape(filename)}</span>_pagina(\d+)\.html$&quot;</span>, re.IGNORECASE)</pre></div>
+
+
+<p>Ele garante que só serão lidos arquivos com o padrão exato:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">quilombo_territorio_pagina1.html
+quilombo_territorio_pagina2.html
+quilombo_territorio_pagina3.html</pre></div>
+
+
+<p>E serão ignorados arquivos como:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">quilombo_territorio.html
+quilombo_territorio_backup.html
+outro_tema_pagina1.html</pre></div>
+
+
+<p>Também corrigi dois pontos importantes do seu código original:</p>
+
+<ol><li>faltava <code>import random</code>, já que você usa <code>random.uniform</code>;</li><li><code>filename</code> agora remove acentos, então <code>quilombo território</code> vira corretamente <code>quilombo_territorio</code>.</li></ol></div></div>
+    <div class="message user-message"><div class="content"><p>ao invés de tentar buscar os abstract, insere neste campo o texto interno da tag "&lt;p class="mb-0 small"&gt; para cada artigo, faz sentido?</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Sim, faz sentido — <strong>desde que exista uma tag <code>&lt;p class="mb-0 small"&gt;</code> correspondente a cada artigo na página HTML</strong>. Nesse caso, você não precisa mais buscar o abstract online; pode preencher o campo <code>abstract</code> do SQLite com esse texto interno.</p>
+
+<p>A substituição principal é na função <code>extrair_itens_do_html</code>.</p>
+
+<p>Use esta versão:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">limpar_texto</span>(<span class="hljs-params">texto</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Normaliza espaços, quebras de linha e tabulações.
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> texto:
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>
+
+    texto = re.sub(<span class="hljs-string">r&quot;\s+&quot;</span>, <span class="hljs-string">&quot; &quot;</span>, texto)
+    <span class="hljs-keyword">return</span> texto.strip()
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">extrair_itens_do_html</span>(<span class="hljs-params">caminho_html</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Extrai:
+    1. o array JS const itens = [...]
+    2. o texto interno de cada &lt;p class=&quot;mb-0 small&quot;&gt;
+    
+    Depois associa cada texto ao respectivo artigo pela ordem em que aparece na página.
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(caminho_html, <span class="hljs-string">&quot;r&quot;</span>, encoding=<span class="hljs-string">&quot;utf-8&quot;</span>) <span class="hljs-keyword">as</span> f:
+        html = f.read()
+
+    soup = BeautifulSoup(html, <span class="hljs-string">&quot;html.parser&quot;</span>)
+
+    <span class="hljs-comment"># Extrai os dados estruturados do const itens</span>
+    script = soup.find(<span class="hljs-string">&quot;script&quot;</span>, string=re.<span class="hljs-built_in">compile</span>(<span class="hljs-string">r&quot;const\s+itens&quot;</span>))
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> script <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> script.string:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;&#x27;const itens&#x27; não encontrado em: <span class="hljs-subst">{caminho_html.name}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+    <span class="hljs-keyword">match</span> = re.search(
+        <span class="hljs-string">r&quot;const\s+itens\s*=\s*(
+%%MB0%%
+);&quot;</span>,
+        script.string,
+        re.DOTALL
+    )
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">match</span>:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Regex não encontrou array de itens em: <span class="hljs-subst">{caminho_html.name}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+    <span class="hljs-keyword">try</span>:
+        itens = demjson3.decode(<span class="hljs-keyword">match</span>.group(<span class="hljs-number">1</span>))
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Erro ao converter itens em <span class="hljs-subst">{caminho_html.name}</span>: <span class="hljs-subst">{e}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+    <span class="hljs-comment"># Extrai os textos das tags &lt;p class=&quot;mb-0 small&quot;&gt;</span>
+    paragrafos = soup.select(<span class="hljs-string">&quot;p.mb-0.small&quot;</span>)
+
+    textos = [
+        limpar_texto(p.get_text(<span class="hljs-string">&quot; &quot;</span>, strip=<span class="hljs-literal">True</span>))
+        <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> paragrafos
+    ]
+
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(textos) != <span class="hljs-built_in">len</span>(itens):
+        <span class="hljs-built_in">print</span>(
+            <span class="hljs-string">f&quot;Atenção em <span class="hljs-subst">{caminho_html.name}</span>: &quot;</span>
+            <span class="hljs-string">f&quot;<span class="hljs-subst">{<span class="hljs-built_in">len</span>(itens)}</span> itens encontrados, mas <span class="hljs-subst">{<span class="hljs-built_in">len</span>(textos)}</span> textos em &lt;p class=&#x27;mb-0 small&#x27;&gt;.&quot;</span>
+        )
+
+    <span class="hljs-comment"># Associa por ordem</span>
+    <span class="hljs-keyword">for</span> i, item <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(itens):
+        <span class="hljs-keyword">if</span> i &lt; <span class="hljs-built_in">len</span>(textos):
+            item[<span class="hljs-string">&quot;concept&quot;</span>] = textos[i]
+        <span class="hljs-keyword">else</span>:
+            item[<span class="hljs-string">&quot;concept&quot;</span>] = <span class="hljs-literal">None</span>
+
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">{caminho_html.name}</span>: <span class="hljs-subst">{<span class="hljs-built_in">len</span>(itens)}</span> itens extraídos.&quot;</span>)
+
+    <span class="hljs-keyword">return</span> itens</pre></div>
+
+
+<p>Depois, remova completamente esta parte:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs">BUSCAR_ABSTRACTS = <span class="hljs-literal">True</span>
+
+<span class="hljs-keyword">if</span> BUSCAR_ABSTRACTS:
+    json_obj = buscar_abstracts(json_obj)</pre></div>
+
+
+<p>E você também pode apagar a função <code>buscar_abstracts</code>, porque ela não será mais usada.</p>
+
+<p>A inserção no SQLite pode continuar igual:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs">item.get(<span class="hljs-string">&quot;concept&quot;</span>)</pre></div>
+
+
+<p>porque agora <code>concept</code> será preenchido com o texto interno de:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">html</span></div><pre class="code-block hljs"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;mb-0 small&quot;</span>&gt;</span></pre></div>
+
+
+<p>O trecho final ficaria assim:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs">json_obj = remover_duplicatas_por_id(todos_itens)
+
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> json_obj:
+    <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Nenhum artigo extraído dos HTMLs encontrados.&quot;</span>)
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Total de artigos únicos: <span class="hljs-subst">{<span class="hljs-built_in">len</span>(json_obj)}</span>&quot;</span>)
+
+salvar_no_sqlite(json_obj, DB_PATH, filename)
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Concluído. Banco salvo em: <span class="hljs-subst">{DB_PATH}</span>&quot;</span>)
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Tabela criada/atualizada: <span class="hljs-subst">{filename}</span>&quot;</span>)</pre></div>
+
+
+<p>Também dá para remover estes imports, se você não for mais fazer requisição online:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs"><span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">import</span> random</pre></div>
+
+
+<p>A cautela principal: essa associação está sendo feita <strong>pela ordem dos artigos na página</strong>. Se o HTML tiver outros <code>&lt;p class="mb-0 small"&gt;</code> que não sejam resumos/descrições dos artigos, pode haver desalinhamento. Mas, se cada resultado da CAPES tem exatamente uma dessas tags, a solução é adequada.</p></div></div>
+    <div class="message user-message"><div class="content"><p>é sim. mas o texto interno está neste formato:</p>
+<p> ... e nas territorialidades do Xambá em seu terreiro-&lt;b&gt;quilombo&lt;/b&gt;. Neste &lt;b&gt;território&lt;/b&gt; se revelam variadas apropriações materiais e imateriais, que  ... </p>
+
+<p>quero que mantenha apenas o texto em sim, sem os elementos que estão nos &lt;&gt;</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Sim. O método correto é usar <code>BeautifulSoup.get_text()</code>. Ele <strong>remove os elementos HTML</strong>, como <code>&lt;b&gt;</code> e <code>&lt;/b&gt;</code>, e mantém apenas o texto interno.</p>
+
+<p>No seu caso, isto:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">html</span></div><pre class="code-block hljs">... e nas territorialidades do Xambá em seu terreiro-<span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>quilombo<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span>. Neste <span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>território<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span> se revelam variadas apropriações materiais e imateriais, que ...</pre></div>
+
+
+<p>vira:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">... e nas territorialidades do Xambá em seu terreiro-quilombo. Neste território se revelam variadas apropriações materiais e imateriais, que ...</pre></div>
+
+
+<p>Use esta função:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">limpar_texto_html</span>(<span class="hljs-params">elemento</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Remove tags HTML internas e normaliza espaços.
+    Exemplo:
+    terreiro-&lt;b&gt;quilombo&lt;/b&gt; -&gt; terreiro-quilombo
+    Neste &lt;b&gt;território&lt;/b&gt; -&gt; Neste território
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> elemento <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>
+
+    texto = elemento.get_text(<span class="hljs-string">&quot;&quot;</span>, strip=<span class="hljs-literal">False</span>)
+
+    texto = re.sub(<span class="hljs-string">r&quot;\s+&quot;</span>, <span class="hljs-string">&quot; &quot;</span>, texto)
+    texto = texto.strip()
+
+    <span class="hljs-keyword">return</span> texto</pre></div>
+
+
+<p>E dentro da função <code>extrair_itens_do_html</code>, use assim:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs">paragrafos = soup.select(<span class="hljs-string">&quot;p.mb-0.small&quot;</span>)
+
+textos = [
+    limpar_texto_html(p)
+    <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> paragrafos
+]</pre></div>
+
+
+<p>A diferença importante é esta:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs">p.get_text(<span class="hljs-string">&quot;&quot;</span>, strip=<span class="hljs-literal">False</span>)</pre></div>
+
+
+<p>Em vez de:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs">p.get_text(<span class="hljs-string">&quot; &quot;</span>, strip=<span class="hljs-literal">True</span>)</pre></div>
+
+
+<p>Por quê? Porque, no seu exemplo, se você usar separador <code>" "</code>, pode acontecer isto:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">terreiro- quilombo</pre></div>
+
+
+<p>Com separador vazio <code>""</code>, ele preserva melhor casos como:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">terreiro-quilombo</pre></div>
+
+
+<p>Então a versão ideal da parte dos parágrafos fica:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">limpar_texto_html</span>(<span class="hljs-params">elemento</span>):
+    <span class="hljs-keyword">if</span> elemento <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>
+
+    texto = elemento.get_text(<span class="hljs-string">&quot;&quot;</span>, strip=<span class="hljs-literal">False</span>)
+    texto = re.sub(<span class="hljs-string">r&quot;\s+&quot;</span>, <span class="hljs-string">&quot; &quot;</span>, texto)
+    <span class="hljs-keyword">return</span> texto.strip()
+
+
+paragrafos = soup.select(<span class="hljs-string">&quot;p.mb-0.small&quot;</span>)
+
+textos = [
+    limpar_texto_html(p)
+    <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> paragrafos
+]</pre></div>
+
+
+<p>Se em algum caso o texto vier como <strong>string crua</strong> contendo tags, e não como elemento BeautifulSoup, use esta alternativa:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">limpar_fragmento_html</span>(<span class="hljs-params">texto_html</span>):
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> texto_html:
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>
+
+    soup_fragmento = BeautifulSoup(texto_html, <span class="hljs-string">&quot;html.parser&quot;</span>)
+    texto = soup_fragmento.get_text(<span class="hljs-string">&quot;&quot;</span>, strip=<span class="hljs-literal">False</span>)
+    texto = re.sub(<span class="hljs-string">r&quot;\s+&quot;</span>, <span class="hljs-string">&quot; &quot;</span>, texto)
+
+    <span class="hljs-keyword">return</span> texto.strip()</pre></div>
+
+
+<p>Mas, para o seu HTML local, a primeira função deve resolver.</p></div></div>
+    <div class="message user-message"><div class="content"><p>refaz o código então com estas alterações</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Segue o código refeito, já com estas alterações:</p>
+
+<ul><li>lê todos os arquivos da pasta <code>Carlos</code>;</li><li>pega apenas os arquivos no padrão <code>{filename}_pagina{n}.html</code>;</li><li>exemplo: <code>quilombo_territorio_pagina1.html</code>, <code>quilombo_territorio_pagina2.html</code>;</li><li>extrai o <code>const itens = [...]</code>;</li><li>extrai o texto de cada <code>&lt;p class="mb-0 small"&gt;</code>;</li><li>remove tags internas como <code>&lt;b&gt;</code>, <code>&lt;i&gt;</code>, <code>&lt;span&gt;</code>;</li><li>insere esse texto no campo <code>abstract</code>;</li><li>salva no banco <code>{pesquisa}.db</code>, por exemplo <code>quilombos.db</code>;</li><li>cria/atualiza a tabela com o nome de <code>filename</code>, por exemplo <code>quilombo_territorio</code>.</li></ul>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs"><span class="hljs-keyword">from</span> bs4 <span class="hljs-keyword">import</span> BeautifulSoup
+<span class="hljs-keyword">import</span> re
+<span class="hljs-keyword">import</span> demjson3
+<span class="hljs-keyword">import</span> sqlite3
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> unicodedata
+<span class="hljs-keyword">from</span> pathlib <span class="hljs-keyword">import</span> Path
+
+
+<span class="hljs-comment"># =========================</span>
+<span class="hljs-comment"># CONFIGURAÇÕES DA PESQUISA</span>
+<span class="hljs-comment"># =========================</span>
+
+pesquisa = <span class="hljs-string">&quot;quilombos&quot;</span>
+termo = <span class="hljs-string">&quot;quilombo território&quot;</span>
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">slugify</span>(<span class="hljs-params">texto</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Transforma &#x27;quilombo território&#x27; em &#x27;quilombo_territorio&#x27;.
+    Remove acentos e caracteres problemáticos para nome de arquivo/tabela.
+    &quot;&quot;&quot;</span>
+    texto = unicodedata.normalize(<span class="hljs-string">&quot;NFKD&quot;</span>, texto)
+    texto = texto.encode(<span class="hljs-string">&quot;ascii&quot;</span>, <span class="hljs-string">&quot;ignore&quot;</span>).decode(<span class="hljs-string">&quot;ascii&quot;</span>)
+    texto = texto.lower()
+    texto = re.sub(<span class="hljs-string">r&quot;[^a-z0-9]+&quot;</span>, <span class="hljs-string">&quot;_&quot;</span>, texto)
+    texto = texto.strip(<span class="hljs-string">&quot;_&quot;</span>)
+    <span class="hljs-keyword">return</span> texto
+
+
+filename = slugify(termo)
+
+<span class="hljs-keyword">try</span>:
+    SCRIPT_DIR = Path(__file__).resolve().parent
+<span class="hljs-keyword">except</span> NameError:
+    SCRIPT_DIR = Path.cwd()
+
+PASTA_HTML = SCRIPT_DIR / <span class="hljs-string">&quot;Carlos&quot;</span>
+DB_PATH = SCRIPT_DIR / <span class="hljs-string">f&quot;<span class="hljs-subst">{pesquisa}</span>.db&quot;</span>
+
+
+<span class="hljs-comment"># =========================</span>
+<span class="hljs-comment"># FUNÇÕES AUXILIARES</span>
+<span class="hljs-comment"># =========================</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">quote_identifier</span>(<span class="hljs-params">nome</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Protege nomes de tabela no SQLite.
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&quot;&#x27;</span> + nome.replace(<span class="hljs-string">&#x27;&quot;&#x27;</span>, <span class="hljs-string">&#x27;&quot;&quot;&#x27;</span>) + <span class="hljs-string">&#x27;&quot;&#x27;</span>
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">limpar_texto_html</span>(<span class="hljs-params">elemento</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Remove tags HTML internas e normaliza espaços.
+
+    Exemplo:
+    terreiro-&lt;b&gt;quilombo&lt;/b&gt; -&gt; terreiro-quilombo
+    Neste &lt;b&gt;território&lt;/b&gt; -&gt; Neste território
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> elemento <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>
+
+    texto = elemento.get_text(<span class="hljs-string">&quot;&quot;</span>, strip=<span class="hljs-literal">False</span>)
+    texto = re.sub(<span class="hljs-string">r&quot;\s+&quot;</span>, <span class="hljs-string">&quot; &quot;</span>, texto)
+    texto = texto.strip()
+
+    <span class="hljs-keyword">return</span> texto
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">encontrar_paginas_html</span>(<span class="hljs-params">pasta, filename</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Encontra arquivos no padrão:
+    {filename}_pagina1.html
+    {filename}_pagina2.html
+    {filename}_pagina3.html
+    etc.
+
+    Exemplo:
+    quilombo_territorio_pagina1.html
+    quilombo_territorio_pagina2.html
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> pasta.exists():
+        <span class="hljs-keyword">raise</span> FileNotFoundError(<span class="hljs-string">f&quot;A pasta não existe: <span class="hljs-subst">{pasta}</span>&quot;</span>)
+
+    padrao = re.<span class="hljs-built_in">compile</span>(
+        <span class="hljs-string">rf&quot;^<span class="hljs-subst">{re.escape(filename)}</span>_pagina(\d+)\.html$&quot;</span>,
+        re.IGNORECASE
+    )
+
+    arquivos = []
+
+    <span class="hljs-keyword">for</span> arquivo <span class="hljs-keyword">in</span> pasta.iterdir():
+        <span class="hljs-keyword">if</span> arquivo.is_file():
+            <span class="hljs-keyword">match</span> = padrao.<span class="hljs-keyword">match</span>(arquivo.name)
+
+            <span class="hljs-keyword">if</span> <span class="hljs-keyword">match</span>:
+                numero_pagina = <span class="hljs-built_in">int</span>(<span class="hljs-keyword">match</span>.group(<span class="hljs-number">1</span>))
+                arquivos.append((numero_pagina, arquivo))
+
+    arquivos.sort(key=<span class="hljs-keyword">lambda</span> x: x[<span class="hljs-number">0</span>])
+
+    <span class="hljs-keyword">return</span> [arquivo <span class="hljs-keyword">for</span> _, arquivo <span class="hljs-keyword">in</span> arquivos]
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">encontrar_script_com_itens</span>(<span class="hljs-params">soup</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Procura o script que contém &#x27;const itens&#x27;.
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">for</span> script <span class="hljs-keyword">in</span> soup.find_all(<span class="hljs-string">&quot;script&quot;</span>):
+        conteudo = script.string <span class="hljs-keyword">or</span> script.get_text()
+
+        <span class="hljs-keyword">if</span> conteudo <span class="hljs-keyword">and</span> re.search(<span class="hljs-string">r&quot;const\s+itens&quot;</span>, conteudo):
+            <span class="hljs-keyword">return</span> conteudo
+
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">extrair_array_itens</span>(<span class="hljs-params">conteudo_script</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Extrai o array JavaScript declarado como:
+    const itens = [...]
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">match</span> = re.search(
+        <span class="hljs-string">r&quot;const\s+itens\s*=\s*(
+%%MB0%%
+);&quot;</span>,
+        conteudo_script,
+        re.DOTALL
+    )
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">match</span>:
+        <span class="hljs-keyword">return</span> []
+
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">return</span> demjson3.decode(<span class="hljs-keyword">match</span>.group(<span class="hljs-number">1</span>))
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Erro ao converter const itens para objeto Python: <span class="hljs-subst">{e}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">extrair_itens_do_html</span>(<span class="hljs-params">caminho_html</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Extrai, de cada página HTML:
+    1. os dados do array JS const itens = [...]
+    2. o texto interno de cada &lt;p class=&quot;mb-0 small&quot;&gt;
+
+    O texto dos parágrafos é inserido em item[&quot;concept&quot;],
+    que depois será gravado no campo abstract do banco SQLite.
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(caminho_html, <span class="hljs-string">&quot;r&quot;</span>, encoding=<span class="hljs-string">&quot;utf-8&quot;</span>) <span class="hljs-keyword">as</span> f:
+        html = f.read()
+
+    soup = BeautifulSoup(html, <span class="hljs-string">&quot;html.parser&quot;</span>)
+
+    conteudo_script = encontrar_script_com_itens(soup)
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> conteudo_script:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;&#x27;const itens&#x27; não encontrado em: <span class="hljs-subst">{caminho_html.name}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+    itens = extrair_array_itens(conteudo_script)
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> itens:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Nenhum item extraído em: <span class="hljs-subst">{caminho_html.name}</span>&quot;</span>)
+        <span class="hljs-keyword">return</span> []
+
+    paragrafos = soup.select(<span class="hljs-string">&quot;p.mb-0.small&quot;</span>)
+
+    textos = [
+        limpar_texto_html(p)
+        <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> paragrafos
+    ]
+
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(textos) != <span class="hljs-built_in">len</span>(itens):
+        <span class="hljs-built_in">print</span>(
+            <span class="hljs-string">f&quot;Atenção em <span class="hljs-subst">{caminho_html.name}</span>: &quot;</span>
+            <span class="hljs-string">f&quot;<span class="hljs-subst">{<span class="hljs-built_in">len</span>(itens)}</span> itens encontrados, mas &quot;</span>
+            <span class="hljs-string">f&quot;<span class="hljs-subst">{<span class="hljs-built_in">len</span>(textos)}</span> textos em &lt;p class=&#x27;mb-0 small&#x27;&gt;.&quot;</span>
+        )
+
+    <span class="hljs-keyword">for</span> i, item <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(itens):
+        <span class="hljs-keyword">if</span> i &lt; <span class="hljs-built_in">len</span>(textos):
+            item[<span class="hljs-string">&quot;concept&quot;</span>] = textos[i]
+        <span class="hljs-keyword">else</span>:
+            item[<span class="hljs-string">&quot;concept&quot;</span>] = <span class="hljs-literal">None</span>
+
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">{caminho_html.name}</span>: <span class="hljs-subst">{<span class="hljs-built_in">len</span>(itens)}</span> itens extraídos.&quot;</span>)
+
+    <span class="hljs-keyword">return</span> itens
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">remover_duplicatas_por_id</span>(<span class="hljs-params">itens</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Remove duplicatas mantendo a primeira ocorrência de cada id.
+    &quot;&quot;&quot;</span>
+    vistos = <span class="hljs-built_in">set</span>()
+    unicos = []
+
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> itens:
+        id_art = item.get(<span class="hljs-string">&quot;id&quot;</span>)
+
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> id_art:
+            <span class="hljs-keyword">continue</span>
+
+        <span class="hljs-keyword">if</span> id_art <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> vistos:
+            vistos.add(id_art)
+            unicos.append(item)
+
+    <span class="hljs-keyword">return</span> unicos
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">salvar_no_sqlite</span>(<span class="hljs-params">itens, db_path, nome_tabela</span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Salva os registros no banco SQLite.
+    O banco terá o nome definido em pesquisa, por exemplo:
+    quilombos.db
+
+    A tabela terá o nome definido em filename, por exemplo:
+    quilombo_territorio
+    &quot;&quot;&quot;</span>
+    tabela = quote_identifier(nome_tabela)
+
+    conn = sqlite3.connect(db_path, isolation_level=<span class="hljs-literal">None</span>)
+
+    conn.execute(<span class="hljs-string">f&quot;&quot;&quot;
+        CREATE TABLE IF NOT EXISTS <span class="hljs-subst">{tabela}</span> (
+            type TEXT,
+            id TEXT PRIMARY KEY,
+            title TEXT,
+            autor TEXT,
+            resource_title TEXT,
+            publish_year TEXT,
+            volume TEXT,
+            issue TEXT,
+            first_page TEXT,
+            last_page TEXT,
+            doi TEXT,
+            abstract TEXT
+        ) STRICT
+    &quot;&quot;&quot;</span>)
+
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> itens:
+        conn.execute(<span class="hljs-string">f&quot;&quot;&quot;
+            INSERT OR REPLACE INTO <span class="hljs-subst">{tabela}</span>
+            (
+                type,
+                id,
+                title,
+                autor,
+                resource_title,
+                publish_year,
+                volume,
+                issue,
+                first_page,
+                last_page,
+                doi,
+                abstract
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        &quot;&quot;&quot;</span>, (
+            item.get(<span class="hljs-string">&quot;type&quot;</span>),
+            item.get(<span class="hljs-string">&quot;id&quot;</span>),
+            item.get(<span class="hljs-string">&quot;title&quot;</span>),
+            item.get(<span class="hljs-string">&quot;autor&quot;</span>),
+            item.get(<span class="hljs-string">&quot;resource_title&quot;</span>),
+            item.get(<span class="hljs-string">&quot;publish_year&quot;</span>),
+            item.get(<span class="hljs-string">&quot;volume&quot;</span>),
+            item.get(<span class="hljs-string">&quot;issue&quot;</span>),
+            item.get(<span class="hljs-string">&quot;first_page&quot;</span>),
+            item.get(<span class="hljs-string">&quot;last_page&quot;</span>),
+            item.get(<span class="hljs-string">&quot;doi&quot;</span>),
+            item.get(<span class="hljs-string">&quot;concept&quot;</span>),
+        ))
+
+    conn.close()
+
+
+<span class="hljs-comment"># =========================</span>
+<span class="hljs-comment"># EXECUÇÃO PRINCIPAL</span>
+<span class="hljs-comment"># =========================</span>
+
+arquivos_html = encontrar_paginas_html(PASTA_HTML, filename)
+
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> arquivos_html:
+    <span class="hljs-keyword">raise</span> FileNotFoundError(
+        <span class="hljs-string">f&quot;Nenhum arquivo encontrado em <span class="hljs-subst">{PASTA_HTML}</span> com o padrão &quot;</span>
+        <span class="hljs-string">f&quot;<span class="hljs-subst">{filename}</span>_pagina{{numero}}.html&quot;</span>
+    )
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Arquivos encontrados: <span class="hljs-subst">{<span class="hljs-built_in">len</span>(arquivos_html)}</span>&quot;</span>)
+
+todos_itens = []
+
+<span class="hljs-keyword">for</span> caminho_html <span class="hljs-keyword">in</span> arquivos_html:
+    itens_pagina = extrair_itens_do_html(caminho_html)
+    todos_itens.extend(itens_pagina)
+
+json_obj = remover_duplicatas_por_id(todos_itens)
+
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> json_obj:
+    <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&quot;Nenhum artigo extraído dos HTMLs encontrados.&quot;</span>)
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Total de artigos únicos: <span class="hljs-subst">{<span class="hljs-built_in">len</span>(json_obj)}</span>&quot;</span>)
+
+salvar_no_sqlite(json_obj, DB_PATH, filename)
+
+<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Concluído.&quot;</span>)
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Banco salvo em: <span class="hljs-subst">{DB_PATH}</span>&quot;</span>)
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Tabela criada/atualizada: <span class="hljs-subst">{filename}</span>&quot;</span>)</pre></div>
+
+
+<p>A parte que resolve exatamente sua demanda é esta:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">python</span></div><pre class="code-block hljs">texto = elemento.get_text(<span class="hljs-string">&quot;&quot;</span>, strip=<span class="hljs-literal">False</span>)</pre></div>
+
+
+<p>Ela transforma:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">html</span></div><pre class="code-block hljs">... terreiro-<span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>quilombo<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span>. Neste <span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>território<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span> se revelam ...</pre></div>
+
+
+<p>em:</p>
+
+
+<div class="code-wrapper"><div class="code-header"><span class="code-lang">text</span></div><pre class="code-block hljs">... terreiro-quilombo. Neste território se revelam ...</pre></div>
+
+
+<p>sem manter os elementos entre <code>&lt; &gt;</code>.</p></div></div>
+    <div class="message user-message"><div class="content"><p>como faço para exportar esta conversa</p></div></div>
+    <div class="message assistant-message"><div class="content"><p>Você tem três caminhos, dependendo do que quer “exportar”:</p>
+
+<h2>1. Exportar todos os seus dados/conversas do ChatGPT</h2>
+
+<p>No ChatGPT web:</p>
+
+<ol><li>Clique no seu perfil/nome, no canto inferior esquerdo.</li><li>Vá em <strong>Settings / Configurações</strong>.</li><li>Abra <strong>Data Controls / Controles de dados</strong>.</li><li>Clique em <strong>Export Data / Exportar dados</strong>.</li><li>Confirme a solicitação.</li><li>Você receberá um e-mail com um link para baixar o arquivo exportado.</li></ol>
+
+<p>A exportação inclui seu histórico de conversas e outros dados da conta; em exports maiores, as conversas podem vir em arquivos como <code>conversations.json</code> ou arquivos numerados. <sup class="cite">[<a href="https://help.openai.com/en/articles/7260999-how-do-i-export-my-chatgpt-history-and-data?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="Exporting your ChatGPT history and data | OpenAI Help Center">OpenAI Help Center</a>]</sup></p>
+
+<h2>2. Compartilhar só esta conversa por link</h2>
+
+<p>Na conversa aberta:</p>
+
+<ol><li>Clique no botão de <strong>compartilhar</strong> no topo da conversa.</li><li>Gere um <strong>link compartilhável</strong>.</li><li>Copie o link.</li></ol>
+
+<p>Segundo a central da OpenAI, links compartilhados criam uma URL única para aquela conversa e podem ser gerados pelo site ou pelos apps. <sup class="cite">[<a href="https://help.openai.com/en/articles/7925741-chatgpt-shared-links-faq/?utm_source=chatgpt.com" target="_blank" rel="noopener" class="cite-num" title="ChatGPT Shared Links FAQ | OpenAI Help Center">OpenAI Help Center</a>]</sup></p>
+
+<h2>3. Salvar esta conversa em PDF</h2>
+
+<p>No navegador:</p>
+
+<ol><li>Pressione <strong>Ctrl + P</strong>.</li><li>Em “Destino”, escolha <strong>Salvar como PDF</strong>.</li><li>Ajuste margens/escala se necessário.</li><li>Salve o arquivo.</li></ol>
+
+<p>Para seu caso, como esta conversa tem material de pesquisa e código, eu recomendo <strong>Ctrl + P → Salvar como PDF</strong> para preservar a leitura humana, e também <strong>Export Data</strong> se quiser arquivar tudo em formato bruto.</p></div></div>
+  </div>
+  <div id="lb"><img id="lb-img"></div>
+  <script>
+    const lb = document.getElementById('lb');
+    const lbImg = document.getElementById('lb-img');
+    document.querySelectorAll('.content img').forEach(img => {
+      img.addEventListener('click', () => { lbImg.src = img.src; lb.classList.add('open'); });
+    });
+    lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+  </script>
+</body>
+</html>
