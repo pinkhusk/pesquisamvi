@@ -416,6 +416,13 @@ A hipótese está conceitualmente boa, mas eu recomendo retirar a ideia de que a
 
 Se quiser, eu posso transformar esse trecho em uma **versão final pronta para o projeto**, em linguagem mais formal e coesa com a introdução e o marco teórico.[^5_1]
 
+
+---
+
+# que dia essa conversa começou?
+
+Esta conversa, pelo que aparece no histórico acessível, começou em **23 de junho de 2026**.
+
 <div align="center">⁂</div>
 
 [^5_1]: Projeto-de-dissertacao.pdf
