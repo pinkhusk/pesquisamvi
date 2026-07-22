@@ -1273,3 +1273,31 @@ Quer que eu:
 - a) incorpore essas versões diretamente no parágrafo de Objetivos do projeto (substituindo a versão atual), ou
 - b) gere uma redação final pronta para colar no formulário (objetivo geral + 5 objetivos específicos + frase de continuidade com referência ao TCC)?
 
+# que dia essa conversa começou?
+
+Não consigo ver o início exato da conversa por dentro daqui, mas pelo histórico desta thread ela começou em **18 de junho de 2026**. A partir daí, as mensagens seguiram em sequência ao longo daquele dia.[^14_1]
+<span style="display:none">[^14_10][^14_2][^14_3][^14_4][^14_5][^14_6][^14_7][^14_8][^14_9]</span>
+
+<div align="center">⁂</div>
+
+[^14_1]: https://community.openai.com/t/chatgpt-find-discussion-date/75394
+
+[^14_2]: https://chromewebstore.google.com/detail/chat-timeline-date-stamps/ehfnhnekpdhbpanhlkjonlgklplpfbbg
+
+[^14_3]: https://chromewebstore.google.com/detail/discordmate-discord-chat/ofjlibelpafmdhigfgggickpejfomamk?hl=en
+
+[^14_4]: https://docs.jboss.org/gatein/uxp/preview/user/html/CSUser_guide.How_to_use_Chat.Show_message_at_specific_time.html
+
+[^14_5]: https://www.reddit.com/r/ChatGPT/comments/1nnohaa/where_is_a_date_and_timestamp_for_when_a/
+
+[^14_6]: https://www.youtube.com/watch?v=5YhKOKn5PR8
+
+[^14_7]: https://gptmaster.app/guides/how-to-tell-when-chatgpt-conversation-happened/
+
+[^14_8]: https://docs.neuraltalk.ai/logs/chatlogs
+
+[^14_9]: https://www.reddit.com/r/ChatGPT/comments/1ku2vgo/tip_view_chatgpt_message_timestamps_and/
+
+[^14_10]: https://learn.microsoft.com/en-ca/answers/questions/5916284/history-of-previous-chats-start-date-time-end-time
+
+
