@@ -1473,3 +1473,10 @@ Se quiser, o próximo passo pode ser eu te passar uma **lista bem objetiva de li
 
 [^18_17]: https://g1.globo.com/df/distrito-federal/noticia/2021/10/25/mortalidade-infantil-df-tem-menor-indice-do-pais-com-queda-de-70percent-em-29-anos.ghtml
 
+
+---
+
+# que dia essa conversa começou
+
+Esta conversa começou em **21 de julho de 2026**.
+
