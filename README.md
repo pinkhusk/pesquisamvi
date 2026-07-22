@@ -1,6 +1,9 @@
 # Pesquisa de Mestrado
 Este repositório vai funcionar como um caderno público de pesquisa de Chico Antônio Rosa, estudante de Mestrado em Direito na Universidade de Brasília.
 
+## Próximo passo
+Estudar metodologia a partir da Coleção "metodologia" no Zotero.
+
 ## Fase atual
 Pesquisa exploratória e definições iniciais.
 
