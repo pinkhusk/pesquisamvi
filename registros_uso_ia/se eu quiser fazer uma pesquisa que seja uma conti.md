@@ -1437,6 +1437,13 @@ Tente buscar por estes termos:
 Se quiser, o próximo passo pode ser eu te passar uma **lista bem objetiva de links e nomes exatos** para localizar esse número mais rápido.
 <span style="display:none">[^18_10][^18_11][^18_12][^18_13][^18_15][^18_3][^18_4][^18_8][^18_9]</span>
 
+---
+
+# que dia essa conversa começou
+
+Esta conversa começou em **21 de julho de 2026**.
+
+
 <div align="center">⁂</div>
 
 [^18_1]: http://sim.saude.gov.br/
@@ -1474,9 +1481,4 @@ Se quiser, o próximo passo pode ser eu te passar uma **lista bem objetiva de li
 [^18_17]: https://g1.globo.com/df/distrito-federal/noticia/2021/10/25/mortalidade-infantil-df-tem-menor-indice-do-pais-com-queda-de-70percent-em-29-anos.ghtml
 
 
----
-
-# que dia essa conversa começou
-
-Esta conversa começou em **21 de julho de 2026**.
 
