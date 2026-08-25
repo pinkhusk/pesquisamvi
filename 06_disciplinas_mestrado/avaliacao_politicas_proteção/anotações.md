@@ -13,8 +13,8 @@ COAN, Marival. Sistemas e políticas públicas. 2. ed. – Florianópolis: Publi
 
 #### Conceitos fundantes
 
-Paradigma
+Paradigma: "qual é o conjunto de pressupostos, valores, crenças, procedimentos que uma **comunidade científica** adota como válidos? 
 
-Ontologia
+Ontologia: qual é a natureza do mundo e dos fenômenos que queremos conhecer?
 
-Epistemologia
+Epistemologia: qual é a relação entre o sujeito que conhece e o objeto que é conhecido?
