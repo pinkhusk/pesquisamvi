@@ -9,6 +9,7 @@ Produto final: ou analisar uma política à luz de um formulário que podemos co
 Textos são cadenciados.
 
 ### Teoria da Complexidade Aplicada às Políticas Públicas
+
 BRASIL. Casa Civil da Presidência da República. Avaliação de políticas públicas: guia prático de análise ex ant, volume 1. / Casa Civil da Presidência da República ... [et al.]. – Brasília:, 2018.
 
 Essa é uma discussão sobre a estrutura da política pública enquanto objeto.
@@ -25,8 +26,40 @@ Epistemologia: qual é a relação entre o sujeito que conhece e o objeto que é
 
 #### Categorias de análise
 
-Sistemas, orgaizações e interações
-
-Hirarquias e centros múltiplos
+- Sistemas, orgaizações e interações; 
+- Hirarquias e centros múltiplos; 
+- Contingência e complexidade; 
+- Evolução, pontos cegos, riscos e perigos;
+- Causalidade generativa e tríade epistêmica.
 
 As políticas públicas como **sistemas de interações** (ideia da rede).
+
+Dimensões centrais: econômica, jurídica e social
+
+"Riscos" são os gerados pela própria política; "perigos" são os exógenos.
+
+#### Reformulando os princípios de gestão
+
+- Policompetência
+- Autonomia dependente
+- Gestão adaptativa e em rede
+- Interações não lineares
+- Interações fortes e fracas
+- Princípio holístico
+- Causalidade complexa
+- Interações tríadicas
+
+#### Pontos centrais
+
+A política pública é um sistema de interação comunicativa.
+
+A contingência é uma postura epistêmiga: o gestor que ignora a contingência acredita que sua sequência de decisões foi a única possível vs. o gestor que a reconhece e se pergunta permanentemente o que foi escolhido em detrimento do que e por que (reflexividade sobre o modelo de gestão).
+
+
+#### Discussão
+
+Ação pública: todos os atores estão envolvidos: avaliação é feita desde o processo inicial. Não temos isso no nosso horizonte. 
+
+Ao invés de "etapa" ("etapista"), "ações": são dinâmicas, podem ser concomitantes...
+
+O direito à terra é subsumido ao direito à propriedade privada
