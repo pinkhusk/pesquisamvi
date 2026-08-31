@@ -30,3 +30,6 @@ Não ser materialista, não organizar a vida em torno da acumulação de capital
 Mulheres são "transferidoras líquidas" do cuidado para o capitalismo.
 
 "O sonho do capitalista é a escravidão".
+
+## Trabalho final
+Trabalho de cinco laudas conectando meu objeto de pesquisa com a matéria.
