@@ -19,5 +19,14 @@ Acumulação de capital + acumulação de desigualdades; coerência de classe de
 Nancy Fraser, capitalismo canibal, capitalismo canibaliza tudo que é necessário para a subsistência, inclusive o cuidado.
 
 ## Relatório do IPEA, capítulo "Cuidar verbo transitivo", "O valor das .... perdidas pela desvalorização do trabalho de cuidado"
-- Ponto de partida: tempo
-- Não ser materialista, não organizar a vida em torno da acumulação de capital, não significa não ter uma relação com a vida
+
+Ponto de partida: tempo
+
+Não ser materialista, não organizar a vida em torno da acumulação de capital, não significa não ter uma relação material com a vida
+
+
+## Comentários
+
+Mulheres são "transferidoras líquidas" do cuidado para o capitalismo.
+
+"O sonho do capitalista é a escravidão".
