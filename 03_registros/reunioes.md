@@ -65,4 +65,4 @@ Trabalhar ao redor de uma questão ao invés de ao redor de autores.
 Pode fazer perguntas como "É possível?". Como é uma pesquisa teórica, sim.
 
 ## Outras questões
-Teoria da Zuboff (Capitalismo da vigilância) vai pro caminho de que não é possível democracia ou luta de classes no capitalismo como está hoje. Big Tech antecipa tanto e transforma em produto que até a revolução vira produto. 
+Teoria da Zuboff (Capitalismo da vigilância) vai pro caminho de que não é possível transformação anticapitalista no interior do Estado de Direito. Big Tech antecipa tanto e transforma em produto que até a revolução vira produto. 
