@@ -64,5 +64,7 @@ Trabalhar ao redor de uma questão ao invés de ao redor de autores.
 
 Pode fazer perguntas como "É possível?". Como é uma pesquisa teórica, sim.
 
+Das outras pesquisas com temas parecidos, faltou entrar em um conceito específico (não vou citar por questão de privacidade e proteção de dados).
+
 ## Outras questões
 Teoria da Zuboff (Capitalismo da vigilância) vai pro caminho de que não é possível transformação anticapitalista no interior do Estado de Direito. Big Tech antecipa tanto e transforma em produto que até a revolução vira produto. 
