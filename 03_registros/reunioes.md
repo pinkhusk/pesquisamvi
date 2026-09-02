@@ -57,3 +57,7 @@ A hipótese poderia ser testada apenas com Marx, não precisaria chegar a Shmitt
 ## Encaminhamentos para o colega
 
 Decidir e daqui um semestre apresentar algo mais robusto e estar com a qualificação pronta. Para a qualificação é necessário um projeto e uma introdução. Um projeto de tese e não um projeto de pesquisa. As decisões vão mudar seu padrão de leitura e sua forma de ler.
+
+Enxugar o que já tem para chegar no que é essencial. 
+
+Trabalhar ao redor de uma questão ao invés de ao redor de autores.
