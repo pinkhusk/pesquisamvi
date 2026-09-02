@@ -27,12 +27,33 @@ Calendário de reuniões quinzenais, temos bastante backlog.
 
 Grupo foi cadastrado no CNPQ.
 
-_Colega promotor da infância e juventude._
 
-No terceiro, eu apresento meu projeto, daqui 45 dias, 30/09, 18h40.
+## 02/09/2026
+Tema: Apresentação de projeto de tese de um colega.
 
-Próximo
-- 02/09, 19h
-- 16/09, a definir horário
-- 30/09, a definir horário
-- 
+## Sugestões do professor
+Escolher um conceito que possa servir de guia para a tese.
+
+Cada autor dá um doutorado. Escolher um conceito, uma forma, uma questão e usar os autores de forma utilitária.
+
+Fazer uma tese conceitual e não uma tese de reconstrução de autores.
+
+Não da pra falar de luta de classes agora sem falar de Big Tech.
+
+Escolher um autor só ou um conceito/um problema e usa os autores pra trabalhar ele.
+
+## Comentários da turma
+
+Não ficou claro o problema
+
+Parâmetros da pesquisa empírica que podem ser aplicados
+
+As teorias são comparáveis por si só, não é necessário olhar para outros elementos, como da realidade dos dois países. 
+
+Discutir a diferença entre os dois já é suficiente.
+
+A hipótese poderia ser testada apenas com Marx, não precisaria chegar a Shmitt.
+
+## Encaminhamentos para o colega
+
+Decidir e daqui um semestre apresentar algo mais robusto e estar com a qualificação pronta. Para a qualificação é necessário um projeto e uma introdução. Um projeto de tese e não um projeto de pesquisa. As decisões vão mudar seu padrão de leitura e sua forma de ler.
