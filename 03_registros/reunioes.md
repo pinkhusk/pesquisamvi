@@ -27,11 +27,10 @@ Calendário de reuniões quinzenais, temos bastante backlog.
 
 Grupo foi cadastrado no CNPQ.
 
-
 ## 02/09/2026
 Tema: Apresentação de projeto de tese de um colega.
 
-## Sugestões do professor
+### Sugestões do professor
 Escolher um conceito que possa servir de guia para a tese.
 
 Cada autor dá um doutorado. Escolher um conceito, uma forma, uma questão e usar os autores de forma utilitária.
@@ -42,7 +41,7 @@ Não da pra falar de luta de classes agora sem falar de Big Tech.
 
 Escolher um autor só ou um conceito/um problema e usa os autores pra trabalhar ele.
 
-## Comentários da turma
+### Comentários da turma
 
 Não ficou claro o problema
 
@@ -54,7 +53,7 @@ Discutir a diferença entre os dois já é suficiente.
 
 A hipótese poderia ser testada apenas com Marx, não precisaria chegar a Shmitt.
 
-## Encaminhamentos para o colega
+### Encaminhamentos para o colega
 
 Decidir e daqui um semestre apresentar algo mais robusto e estar com a qualificação pronta. Para a qualificação é necessário um projeto e uma introdução. Um projeto de tese e não um projeto de pesquisa. As decisões vão mudar seu padrão de leitura e sua forma de ler.
 
@@ -66,5 +65,5 @@ Pode fazer perguntas como "É possível?". Como é uma pesquisa teórica, sim.
 
 Das outras pesquisas com temas parecidos, faltou entrar em um conceito específico (não vou citar por questão de privacidade e proteção de dados).
 
-## Outras questões
+### Outras questões
 Teoria da Zuboff (Capitalismo da vigilância) vai pro caminho de que não é possível transformação anticapitalista no interior do Estado de Direito. Big Tech antecipa tanto e transforma em produto que até a revolução vira produto. 
