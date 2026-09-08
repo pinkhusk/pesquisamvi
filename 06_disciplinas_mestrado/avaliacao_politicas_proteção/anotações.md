@@ -106,6 +106,11 @@ Focalizada ou universal?
 - Orçamento previsto x executado
 - De onde vem o dinheiro
 
+#### Eficiência e economicidade
+- Custo por produto entregue
+- Custo por beneficiário
+- Comparar com políticas parecidas
+
 #### Discussão
 
 Ação pública: todos os atores estão envolvidos: avaliação é feita desde o processo inicial. Não temos isso no nosso horizonte. 
@@ -117,3 +122,5 @@ O direito à terra é subsumido ao direito à propriedade privada
 Burocracia de nível de rua
 
 [Interoperabilidade](https://www.gov.br/governodigital/pt-br/IND/interoperabilidade): "é a capacidade de diversos sistemas e organizações trabalharem em conjunto para garantir que pessoas, organizações e sistemas computacionais interajam para trocar informações de maneira eficaz e eficiente."
+
+Benefício financeiro: dinheiro na mão, não é com destino certo; bolsa-família e BPC, por exemplo.
