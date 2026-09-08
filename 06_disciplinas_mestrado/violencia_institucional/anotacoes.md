@@ -1,35 +1,95 @@
-# Aula de 31/08/2026
+# AVALIAÇÃO DE POLÍTICAS PÚBLICAS DE PROTEÇÃO PARA INFÂNCIAS E JUVENTUDES
+## 25/08/2026
+### Informações básicas da matéria
 
-Já teve nove textos.
+14h55, CEAM
 
-## Calibã e a bruxa, Cap. 2, Acumulação do trabalho e degradação das mulheres
+Produto final: ou analisar uma política à luz de um formulário que podemos construir na sala, ou elaborar um projeto de avaliação de uma política, ou escrever algo das categorias que foram ensinadas. Melhor em grupo, processo avaliativo não se faz sozinho. 
 
-Não há classe sem identidades. 
+Textos são cadenciados.
 
-Amplia a dimensão da luta de classes para a corporeidade e sexualidade.
+### Teoria da Complexidade Aplicada às Políticas Públicas
 
-Desencantamento do mundo: mudar a racionalidade, destruir os conhecimentos a partir da natureza, cisão entre ser humano e natureza. Mundo deixa de ser entendido como espaço vivo e passa a ser entendido como recurso.
+BRASIL. Casa Civil da Presidência da República. Avaliação de políticas públicas: guia prático de análise ex ant, volume 1. / Casa Civil da Presidência da República ... [et al.]. – Brasília:, 2018.
 
-Forjada a mulher ideal, novo ideal de feminilidade, sob tutela masculina.
+Essa é uma discussão sobre a estrutura da política pública enquanto objeto.
 
-Depreciação cultural das mulheres, infantilização jurídica, marginalização de profissões, aumento da quantidade de trabalhadoras sexuais (trabalho sexual foi criminalizado posteriormente).
+Ponto central do texto: Como a teoria da complexidade contribui para avaliação de políticas públicas?
 
-Acumulação de capital + acumulação de desigualdades; coerência de classe desmobilizada a partir do antagonismo de gênero.
+#### Conceitos fundantes
 
-Nancy Fraser, capitalismo canibal, capitalismo canibaliza tudo que é necessário para a subsistência, inclusive o cuidado.
+Paradigma: "qual é o conjunto de pressupostos, valores, crenças, procedimentos que uma **comunidade científica** adota como válidos? 
 
-## Relatório do IPEA, capítulo "Cuidar verbo transitivo", "O valor das .... perdidas pela desvalorização do trabalho de cuidado"
+Ontologia: qual é a natureza do mundo e dos fenômenos que queremos conhecer?
 
-Ponto de partida: tempo
+Epistemologia: qual é a relação entre o sujeito que conhece e o objeto que é conhecido?
 
-Não ser materialista, não organizar a vida em torno da acumulação de capital, não significa não ter uma relação material com a vida
+#### Categorias de análise
 
+- Sistemas, orgaizações e interações; 
+- Hirarquias e centros múltiplos; 
+- Contingência e complexidade; 
+- Evolução, pontos cegos, riscos e perigos;
+- Causalidade generativa e tríade epistêmica.
 
-## Comentários
+As políticas públicas como **sistemas de interações** (ideia da rede).
 
-Mulheres são "transferidoras líquidas" do cuidado para o capitalismo.
+Dimensões centrais: econômica, jurídica e social
 
-"O sonho do capitalista é a escravidão".
+"Riscos" são os gerados pela própria política; "perigos" são os exógenos.
 
-## Trabalho final
-Trabalho de cinco laudas conectando meu objeto de pesquisa com a matéria.
+#### Reformulando os princípios de gestão
+
+- Policompetência
+- Autonomia dependente
+- Gestão adaptativa e em rede
+- Interações não lineares
+- Interações fortes e fracas
+- Princípio holístico
+- Causalidade complexa
+- Interações tríadicas
+
+#### Pontos centrais
+
+A política pública é um sistema de interação comunicativa.
+
+A contingência é uma postura epistêmiga: o gestor que ignora a contingência acredita que sua sequência de decisões foi a única possível vs. o gestor que a reconhece e se pergunta permanentemente o que foi escolhido em detrimento do que e por que (reflexividade sobre o modelo de gestão).
+
+#### Discussão
+
+Ação pública: todos os atores estão envolvidos: avaliação é feita desde o processo inicial. Não temos isso no nosso horizonte. 
+
+Ao invés de "etapa" ("etapista"), "ações": são dinâmicas, podem ser concomitantes...
+
+O direito à terra é subsumido ao direito à propriedade privada
+
+## 08/09/2026
+
+### Análise _ex post_ de políticas públicas
+Texto: Guia Prático de Análise Ex Post 
+
+#### Descrição
+Nome, finalidade, quando foi criada, é sucessão de outra?, normas reguladoras, instituições envolvidas, abrangência territorial.
+
+Operação carro-pipa
+
+#### Diagnóstico
+
+O problema ainda existe? As causas ainda são as mesmas? Ferramenta: Árvore do problema.
+
+<img width="547" height="447" alt="image" src="https://github.com/user-attachments/assets/8de70546-38d0-45e8-9b97-871ffe60a59a" />
+
+#### Desenho da política
+Modelo lógico (instrumento da Teoria do Programa):
+- Insumos: recursos do setor público necessários para atingir os objetivos da política.
+- Processos: ações que combinam os recursos disponíveis para produzir bens e serviços a fim de atacar as causas do problema.
+- Produtos: são so bens ou serviços resultantes de um processo, ou seja, as entregas (_outputs_) que a política faz para atacar as causas e gerar resultados.
+- Resultados: mudanças incidentes sobre as causas do problema, que decorrem de um ou mais produtos; mudanças de curto prazo.
+- Impactos: mudanças de mais longo prazo no problema que a política busca enfrentar, alinhado aos objetivos da política.
+
+<img width="1126" height="623" alt="image" src="https://github.com/user-attachments/assets/921fe42d-72e7-42c2-9204-e63586e22170" />
+
+Incentivos
+
+Focalizada ou universal?
+
