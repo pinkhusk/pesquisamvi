@@ -55,6 +55,51 @@ A política pública é um sistema de interação comunicativa.
 
 A contingência é uma postura epistêmiga: o gestor que ignora a contingência acredita que sua sequência de decisões foi a única possível vs. o gestor que a reconhece e se pergunta permanentemente o que foi escolhido em detrimento do que e por que (reflexividade sobre o modelo de gestão).
 
+## 08/09/2026
+
+### Análise _ex post_ de políticas públicas
+Texto: Guia Prático de Análise Ex Post 
+
+#### Descrição
+Nome, finalidade, quando foi criada, é sucessão de outra?, normas reguladoras, instituições envolvidas, abrangência territorial.
+
+Operação carro-pipa
+
+#### Diagnóstico
+
+O problema ainda existe? As causas ainda são as mesmas? Ferramenta: Árvore do problema.
+
+<img width="547" height="447" alt="image" src="https://github.com/user-attachments/assets/8de70546-38d0-45e8-9b97-871ffe60a59a" />
+
+#### Desenho da política
+Modelo lógico (instrumento da Teoria do Programa):
+- Insumos: recursos do setor público necessários para atingir os objetivos da política.
+- Processos: ações que combinam os recursos disponíveis para produzir bens e serviços a fim de atacar as causas do problema.
+- Produtos: são so bens ou serviços resultantes de um processo, ou seja, as entregas (_outputs_) que a política faz para atacar as causas e gerar resultados.
+- Resultados: mudanças incidentes sobre as causas do problema, que decorrem de um ou mais produtos; mudanças de curto prazo.
+- Impactos: mudanças de mais longo prazo no problema que a política busca enfrentar, alinhado aos objetivos da política.
+
+<img width="1126" height="623" alt="image" src="https://github.com/user-attachments/assets/921fe42d-72e7-42c2-9204-e63586e22170" />
+
+Incentivos
+
+Focalizada ou universal?
+
+#### Implementação
+- Foi executado como planejado? (Questão: essa pergunta de sim ou não não dá muito insumo, deveria questionar de forma aberta, o que foi, quais os gaps, etc..)
+- Entrega chegou ao beneficiário?
+- Gestão de riscos
+- Transparência do processo
+
+#### Governança
+- Liderança, Estratégia e Controle (Decreto 9.203/2017)
+- Papeis e responsabilidades claros?
+- Participação social existe?
+
+#### Impactos
+- Causalidade real (não só correlação)
+- Precisa de grupo de controle
+- Tabela: quando vale a pena avaliar impacto
 
 #### Discussão
 
@@ -63,3 +108,7 @@ Ação pública: todos os atores estão envolvidos: avaliação é feita desde o
 Ao invés de "etapa" ("etapista"), "ações": são dinâmicas, podem ser concomitantes...
 
 O direito à terra é subsumido ao direito à propriedade privada
+
+Burocracia de nível de rua
+
+[Interoperabilidade](https://www.gov.br/governodigital/pt-br/IND/interoperabilidade): "é a capacidade de diversos sistemas e organizações trabalharem em conjunto para garantir que pessoas, organizações e sistemas computacionais interajam para trocar informações de maneira eficaz e eficiente."
