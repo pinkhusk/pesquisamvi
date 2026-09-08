@@ -101,6 +101,11 @@ Focalizada ou universal?
 - Precisa de grupo de controle
 - Tabela: quando vale a pena avaliar impacto
 
+#### Execução orçamentária
+- Gasto orçamentário (direto) x Subsídios da União (tributário/creditício; isenção fiscal)
+- Orçamento previsto x executado
+- De onde vem o dinheiro
+
 #### Discussão
 
 Ação pública: todos os atores estão envolvidos: avaliação é feita desde o processo inicial. Não temos isso no nosso horizonte. 
